@@ -1,0 +1,118 @@
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Class Scheduler</title>
+</head>
+
+<body>
+  <!-- nav bar -->
+  <div class="topnav">
+    <a href="shoppingcart.html">Shopping Cart</a>
+    <a href="contact.html">Contact Us</a>
+    <a href="createaccount.html">No Account? Create One!</a>
+  </div>
+
+  <!-- student/teacher login buttons -->
+  <div class="login-buttons">
+    <button onclick="document.getElementById('id01').style.display='block'">Teacher Login</button>
+    <button onclick="document.getElementById('id02').style.display='block'">Student Login</button>
+  </div>
+
+<!-- teacher login -->
+<div id="id01" class="modal">
+  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content animate" action="/action_page.php">
+    <div class="container">
+      <h3>Teacher Login</h3>
+      <label for="uname">Username</label><br>
+      <input type="text" placeholder="Enter Username" name="uname" required><br>
+      <label for="psw">Password</label><br>
+      <input type="password" placeholder="Enter Password" name="psw" required><br>
+      <button type="submit">Login</button>
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- student login -->
+<div id="id02" class="modal">
+  <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content animate" action="/action_page.php">
+    <div class="container">
+      <h3>Student Login</h3>
+      <label for="uname">Username</label><br>
+      <input type="text" placeholder="Enter Username" name="uname" required><br>
+      <label for="psw">Password</label><br>
+      <input type="password" placeholder="Enter Password" name="psw" required><br>
+      <button type="submit">Login</button>
+      <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
+    </div>
+  </form>
+</div>
+</head>
+  
+  <!-- course selection -->
+<div class="course-section">
+  <h2>Courses Offered</h2>
+  <div class="course-card">
+    <h4>ENGL 111 - English Composition - 3 Credit Hours</h4>
+    <p>English Composition is designed to develop students’ abilities to craft, organize, and express ideas clearly and effectively in their own writing. 
+      This course incorporates critical reading, critical thinking, and the writing process, as well as research and the ethical use of sources in writing for the academic community. 
+      Extended essays, including a researched argument, are required.</p>
+    <button onclick="addToCart('ENGL 111 - English Composition')">Add to Cart</button>
+
+  </div>
+  <div class="course-card">
+    <h4>ENGL 202 - Creative Writing - 3 Credit Hours</h4>
+    <h4>Prerequesites - ENGL 111</h4>
+    <p>This course introduces students to opportunities for self-expression in two or more literary genres 
+      - fiction, poetry, drama, and creative nonfiction.</p>
+    <button onclick="addToCart('ENGL 202 - Creative Writing')">Add to Cart</button>
+  </div>
+  <div class="course-card">
+    <h4>MATH 221 - Calculus for Technology I - 3 Credit Hours</h4>
+    <p>First course in a two-semester sequence in the techniques of calculus, with an emphasis on how they are applied to technology. 
+      Topics include limits, continuity, first and second derivatives, definite and indefinite integrals, 
+      and applications of these concepts..</p>
+    <button onclick="addToCart('MATH 221 - Calculus for Technology I')">Add to Cart</button>
+  </div>
+  <div class="course-card">
+    <h4>MATH 222 - Calculus for Technology II - 3 Credit Hours</h4>
+    <h4>Prerequesites - MATH 221</h4>
+    <p>Second course in a two-semester sequence in the techniques of calculus, with an emphasis on how they are applied to technology. 
+      Topics include the calculus of transcendental functions, techniques of integration, differential equations, 
+      infinite series, and applications of these concepts.</p>
+    <button onclick="addToCart('MATH 222 - Calculus for Technology II')">Add to Cart</button>
+  </div>
+  <div class="course-card">
+    <h4>BIOL 121 - General Biology I - 3 Credit Hours</h4>
+    <p>Students will be introduced to those biological and chemical principles associated with cell structure and function, photosynthesis, cellular respiration, 
+      mitosis, meiosis, molecular and Mendelian genetics, enzyme function and energetics. 
+      An overview of natural selection and biotechnology as it applies to prokaryotes and eukaryotes.</p>
+    <button onclick="addToCart('BIOL 121 - General Biology I')">Add to Cart</button>
+  </div>
+  <div class="course-card">
+    <h4>BIOL 122 - General Biology II - 3 Credit Hours</h4>
+    <h4>Prerequesites - BIOL 121</h4>
+    <p>Students will be introduced to those principles associated with evolution, form and function of plants and animals, and ecology. 
+      The course will trace the evolution of organisms and explore plant structures, development and interaction with their environment. 
+      Students will look at anatomy, physiology, development and behavior of animals and will learn aspects of conservation biology.</p>
+    <button onclick="addToCart('BIOL 122 - General Biology II')">Add to Cart</button>
+  </div>
+  </div>
+</div>
+  <script>
+  function addToCart(courseName) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.push(courseName);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(courseName + ' added to cart!');
+  }
+</script>
+</body>
+
+<footer class="footer">
+  &copy; 2025 Group 6 Class Scheduler
+</footer>
+
+</html>

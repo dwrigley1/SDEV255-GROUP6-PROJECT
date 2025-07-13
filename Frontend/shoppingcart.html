@@ -1,0 +1,106 @@
+<DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+  <title>Class Scheduler</title>
+
+<head>
+<body>
+<div class="topnav">
+  <a href="contact.html">Contact Us</a>
+  <a href="createaccount.html"> No Account? Create One!</a>
+  <a href="index.html">Return Home</a>
+</div>
+</div>
+  <!-- Login Buttons-->
+<div class="login-buttons">
+  <button onclick="document.getElementById('id01').style.display='block'">Teacher Login</button>
+  <button onclick="document.getElementById('id02').style.display='block'">Student Login</button>
+</div>
+
+<!-- Teacher Login Modal -->
+<div id="id01" class="modal">
+  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content animate" action="/action_page.php">
+    <div class="container">
+      <h3>Teacher Login</h3>
+      <label for="uname">Username</label><br>
+      <input type="text" placeholder="Enter Username" name="uname" required><br>
+      <label for="psw">Password</label><br>
+      <input type="password" placeholder="Enter Password" name="psw" required><br>
+      <button type="submit">Login</button>
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Student Login Modal -->
+<div id="id02" class="modal">
+  <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content animate" action="/action_page.php">
+    <div class="container">
+      <h3>Student Login</h3>
+      <label for="uname">Username</label><br>
+      <input type="text" placeholder="Enter Username" name="uname" required><br>
+      <label for="psw">Password</label><br>
+      <input type="password" placeholder="Enter Password" name="psw" required><br>
+      <button type="submit">Login</button>
+      <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
+    </div>
+  </form>
+</div>
+</head>
+<body>
+<body>
+  <h2>Shopping Cart</h2>
+  <ul id="cart-list"></ul>
+
+  <script> 
+  /* this function clears the cart */
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartList = document.getElementById('cart-list');
+      cartList.innerHTML = '';
+      /* inform user cart is empty */
+    if (cart.length === 0) {
+      const emptyMessage = document.createElement('p');
+      emptyMessage.textContent = 'Shopping Cart is Empty!';
+      cartList.appendChild(emptyMessage);
+    } else {
+      cart.forEach((course, index) => {
+        const li = document.createElement('li');
+        li.textContent = course + ' ';
+        
+        /* the remove button to trigger the function */
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => removeCourse(index);
+        li.appendChild(removeBtn);
+        cartList.appendChild(li);
+      });
+    }
+  }
+    /* this function allows an individual course to be removed */
+    function removeCourse(index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+
+    loadCart();
+  </script>
+</body>
+
+<!-- This will need the logic to actually check to see if it satisfies all parameters to allow the schedule to be -->
+<button onclick="confirmSchedule('')">Confirm Schedule</button>
+  <script>
+  function confirmSchedule() {
+    alert(' Schedule Confirmed!');
+  }
+</script>
+
+<footer class="footer">
+        &copy; 2025 Group 6 Class Scheduler
+    </footer>
+</html>
