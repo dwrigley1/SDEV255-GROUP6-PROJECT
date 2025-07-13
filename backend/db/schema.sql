@@ -8,7 +8,7 @@ CREATE TABLE users (
   password TEXT NOT NULL,
   first_name TEXT,
   last_name TEXT,
-  role TEXT CHECK(role IN ('teacher',)) NOT NULL
+  role TEXT CHECK(role IN ('teacher', 'student')) NOT NULL
 );
 
 -- created by teachers
