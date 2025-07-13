@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json())
 app.use(cors());
 const router = express.Router();
-const db = new sqlite3.Database('./test.db',(err)=>{})
+const db = new sqlite3.Database('./test2.db',(err)=>{})
 
 
 
@@ -14,13 +14,15 @@ const db = new sqlite3.Database('./test.db',(err)=>{})
 
 
 //login and validation
-router.get('/login/:username/:password',function(req,res)
+router.get('/login/:email/:password',function(req,res)
     {
-        const {username,password} = req.params
+        
+        const {email,password} = req.params
             try
                 {
                     //Example query for login check
-                    const queryStmt = db.get('SELECT * FROM users WHERE first_name = ? AND last_name = ?',[username,password],function (err,row)
+                    console.log(`${email}:${password}`)
+                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
                         {
                             if (err)
                                 {
@@ -50,16 +52,30 @@ router.get('/login/:username/:password',function(req,res)
 
 //create user
 
-router.post('/login/:first_name/:last_name',function(req,res)
+router.post('/login',function(req,res)
     {
-        const {first_name,last_name} = req.params
-        const {email} = req.body
+    
+        const {id,email,password,first_name,last_name,role} = req.body
+        // Example of how to format post request for creating user 
+        // `       {
+        //             "id":"4"
+        //             "email":"fingus22@example.com",
+        //             "password":"password1234",
+        //             "first_name":"bill",
+        //             "last_name":"burr",
+        //              "role":"teacher"
+        //         }`
+
+
+
+
             try
                 {
                     //insert statment
-                    const insertStmt = db.prepare('INSERT INTO users (first_name,last_name,teacher,email) values (?,?,?,?)')
-                    insertStmt.run(first_name,last_name,0,email,function(err)
-                        {
+                    console.log(`${email}:${password}:${first_name},${last_name}`)
+                    const insertStmt = db.prepare('INSERT INTO users (id,email,password,first_name,last_name,role) values (?,?,?,?,?,?)')
+                    insertStmt.run(4,email,password,first_name,last_name,role,function(err)
+                        { 
                             if (err)
                                 {
                                     console.error("Error inserting data:",err)
@@ -81,27 +97,47 @@ router.post('/login/:first_name/:last_name',function(req,res)
                 }
     });
 
-router.put('/login/:ID/',function(req,res)
+router.put('/login/:email/',function(req,res)
     {
-        const {ID}= req.params
-        const {changes} =req.body
+        const {email}= req.params
+        const changes = req.body
         // struture for puts are {column:value}
-
+       
         try
-            {
-                db.run(`UPDATE user SET ${JSON.keys(changes)}= ? WHERE ID = ?`,[JSON.values(changes),ID],function(err)
+            {   let errors = []
+                let updated = 0
+                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
-                        if(err)
+                        console.log(i)
+                        db.run(`UPDATE users SET ${Object.keys(changes)[i]}= ? WHERE email = ?`,[Object.values(changes)[i],email],function(err)
+                            { 
+                                if(err)
+                                    {
+                                        errors.push(err)
+                                    }
+                                else
+                                    {
+                                        console.log("test", updated)
+                                        updated += 1;
+                                    }
+                            })
+
+                    }
+                console.log(`Updated: ${updated}:Errors ${errors.length}`)
+                if (updated+errors.length==Object.keys(changes).length)
+                    {
+                        if (errors.length>0)
                             {
-                                console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                return res.sendStatus(500).json({errors:errors})
                             }
                         else
-                            {
-                                res.sendStatus(200);
-                            }
-                    })
-            }
+                        {
+                            return res.statusCode(200)
+                        }
+                    } 
+
+            }   
         catch(e)
             {
                 console.log(e)
