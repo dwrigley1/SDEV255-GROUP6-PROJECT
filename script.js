@@ -10,10 +10,6 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
       console.log("Login success:", data);
     })
     .catch(err => {
-
-        \'
-        ['
-        ;l>'
       console.error("Login failed:", err);
     });
 });
