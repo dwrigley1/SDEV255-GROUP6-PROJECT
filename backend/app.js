@@ -19,21 +19,44 @@ router.get("/initalize",async function(req,res)
         try{
         const sql = await fs.readFile(fp_schema,"utf8");
         
-        await new Promise((resolve,reject)=>{
-            db.exec(sql,function(err){
-                if (err)
+        await new Promise((resolve,reject)=>
+            {
+                db.exec(sql,function(err)
                     {
-                        console.log(err)
-                        reject(err);
-                        res.sendStatus(500)
-                    }
-                else
-                {
-                    resolve();
-                    res.sendStatus(200)
-                }
+                        if (err)
+                            {
+                                console.log(err)
+                                reject(err);
+                                res.sendStatus(500)
+                            }
+                        else
+                            {
+                                resolve();
+                                res.sendStatus(200)
+                            }
+                    })
+            
+                })
+        const sql2 = await fs.readFile(fp_seed,"utf8");
+        
+        await new Promise((resolve,reject)=>
+            {
+                db.exec(sql,function(err)
+                    {
+                        if (err)
+                            {
+                                console.log(err)
+                                reject(err);
+                                res.sendStatus(500)
+                            }
+                        else
+                        {
+                            resolve();
+                            res.sendStatus(200)
+                        }
+                    })
             })
-        })}
+        }
         catch(e)
         {
             console.log(e)
