@@ -141,3 +141,4 @@ vite.config.ts.timestamp-*
 
 #Test DB
 test.db
+test2.db

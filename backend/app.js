@@ -3,11 +3,46 @@ const express = require("express");
 const sqlite3 = require('sqlite3').verbose();
 var cors= require('cors');
 const app = express();
+const fs = require('fs').promises;
+const path =require('path');
 app.use(express.json())
 app.use(cors());
 const router = express.Router();
 const db = new sqlite3.Database('./test2.db',(err)=>{})
+const fp_schema = path.join(__dirname,"/DB/schema.sql")
+const fp_seed = path.join(__dirname,"/DB/seed.sql")
 
+console.log(fp_schema)
+
+router.get("/initalize",async function(req,res)
+    {
+        try{
+        const sql = await fs.readFile(fp_schema,"utf8");
+        
+        await new Promise((resolve,reject)=>{
+            db.exec(sql,function(err){
+                if (err)
+                    {
+                        console.log(err)
+                        reject(err);
+                        res.sendStatus(500)
+                    }
+                else
+                {
+                    resolve();
+                    res.sendStatus(200)
+                }
+            })
+        })}
+        catch(e)
+        {
+            console.log(e)
+
+        }
+
+
+
+    })
 
 
 
@@ -78,7 +113,7 @@ router.post('/login',function(req,res)
                         { 
                             if (err)
                                 {
-                                    console.error("Error inserting data:",err)
+                                    console.error("Error inserting change:",err)
                                     res.sendStatus(500).json({error:err})
                                 }
                             else 
@@ -122,10 +157,10 @@ router.put('/login/:email/',function(req,res)
                                         updated += 1;
                                     }
                             })
-
+                            
                     }
                 console.log(`Updated: ${updated}:Errors ${errors.length}`)
-                if (updated+errors.length==Object.keys(changes).length)
+                if (updated+errors.length==Object.keys(changes).length-1)
                     {
                         if (errors.length>0)
                             {
@@ -133,7 +168,7 @@ router.put('/login/:email/',function(req,res)
                             }
                         else
                         {
-                            return res.statusCode(200)
+                            return res.sendStatus(200)
                         }
                     } 
 
@@ -156,6 +191,11 @@ router.delete('/login/:ID',function(req,res)
                                 console.log(err)
                                 res.sendStatus(500).json({error:err})
                             }
+                        else
+                            {
+                                res.sendStatus(200)
+
+                            }    
                     })
             }
         catch(e)
@@ -172,10 +212,10 @@ router.get('/courses/:userID',function(req,res)
     {
         const {userID}= req.params;
         try
-            {
+            { 
                 //login function checking db
-                db.all('SELECT A.Name, A.description, A.credit_hours FROM courses as A FULL JOIN student_completed_courses as B on B.courseID = A.CourseID WHERE B.ID = ?',[userID],function(err,row)
-                    {
+                db.all('SELECT A.name, A.description, A.subject, A.credits FROM courses as A FULL JOIN enrollment as B on B.course_id = A.id WHERE B.user_id = ?',[userID],function(err,row)
+                    { 
                         if(err)
                             {
                                 console.log(err)
@@ -213,7 +253,7 @@ router.put('/courses/:coursesID',function(req,res)
             {
                 //inserts completed courses to user
                 console.log(`Value: ${Object.values(completedCourses)[0]} \n ${coursesID}`)
-                db.run(`UPDATE courses SET ${Object.keys(completedCourses)} = ? WHERE courseID = ?`,[Object.values(completedCourses)[0],coursesID],function(err)
+                db.run(`UPDATE courses SET ${Object.keys(completedCourses)} = ? WHERE id = ?`,[Object.values(completedCourses)[0],coursesID],function(err)
                     {
                         if (err)
                             {
@@ -240,7 +280,7 @@ router.put('/courses/:coursesID',function(req,res)
         const {coursesID} = req.params
         try
             {
-                db.run(`DELETE FROM courses WHERE courseID =? `,[coursesID],function(err)
+                db.run(`DELETE FROM courses WHERE id =? `,[coursesID],function(err)
                     {
                         if (err)
                             {
@@ -277,7 +317,7 @@ router.post('/cart/:user/:orderNum/',function(req,res)
                 //create cart    
                 let errors = []
                 let inserted = 0
-                const insertStmt = db.prepare(`INSERT INTO cart (orderNum,ID,courseID) VALUES (?,?,?)`)
+                const insertStmt = db.prepare(`INSERT INTO cart (id,user_id,course_id,order_num) VALUES (?,?,?,?)`)
                 for (const courseID of coursesID)
                     {
                 
@@ -285,7 +325,7 @@ router.post('/cart/:user/:orderNum/',function(req,res)
                         //console.log(`coursesID ${coursesID.length}`)
                         console.log(`coursesID elements :${courseID}`)
                     
-                        insertStmt.run([orderNum,user,courseID],function(err)
+                        insertStmt.run([orderNum,user,courseID,orderNum],function(err)
                             {
                                 if (err)
                                     {
@@ -321,13 +361,24 @@ router.post('/cart/:user/:orderNum/',function(req,res)
     })
 
 
-router.get('/cart/:username/:orderNum',function(req,res)
+router.get('/cart/:user_id/:orderNum',function(req,res)
     {
-        const {userName,orderNum} = req.params
+        const {user_id,orderNum} = req.params
         try
             {
-                let result = "result of parsing"//Fetch orderNum
-                res.json({result:`${result}`})
+                //let result = "result of parsing"//Fetch orderNum
+                db.all("SELECT * FROM cart WHERE user_id = ? AND order_num = ?",[user_id,orderNum],function(err,row)
+                {
+                    if(err)
+                        {
+                            console.log(err)
+                            return res.sendStatus(500)
+                        }
+                    else
+                        {
+                            res.json(row)
+                        }
+                })
             }
         catch(e)
             {
@@ -337,26 +388,50 @@ router.get('/cart/:username/:orderNum',function(req,res)
     })
 
 
-router.put('/cart/:userName/:orderNum',function(req,res)
+router.put('/cart/:user_id/:orderNum',function(req,res)
     {
-        const {userName,orderNum} = req.params
-        const data = req.body
+        const {user_id,orderNum} = req.params
+        const changes = req.body
+      
+
         try
-            {    
-                for (let i=0;i++;data.length)
+            {   let errors = []
+                let updated = 0
+                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
-                        if (Object.keys(data)[i] in columns)
-                        {
-                            column_key = Object.values(data)
-                        }
+                        console.log(i)
+                        db.run(`UPDATE cart SET ${Object.keys(changes)[i]}= ? WHERE user_id = ? and order_num= ?`,[Object.values(changes)[i],user_id,orderNum],function(err)
+                            { 
+                                if(err)
+                                    {
+                                        errors.push(err)
+                                    }
+                                else
+                                    {
+                                        console.log("test", updated)
+                                        updated += 1;
+                                    }
+                            })
+                            
                     }
-                console.log(Object.keys(data))
-                res.send(data)
-            }
+                console.log(`Updated: ${updated}:Errors ${errors.length}`)
+                if (updated+errors.length==Object.keys(changes).length-1)
+                    {
+                        if (errors.length>0)
+                            {
+                                return res.sendStatus(500).json({errors:errors})
+                            }
+                        else
+                        {
+                            return res.sendStatus(200)
+                        }
+                    } 
+
+            }   
         catch(e)
             {
                 console.log(e)
-                res.sendStatus(403)
             }
     })
 
@@ -366,7 +441,7 @@ router.delete('/cart/:user/:orderNum',function(req,res)
         const {user,orderNum} = req.params
         try
             {
-                db.run('DELETE FROM cart WHERE ID =? AND orderNum = ?',[user,orderNum],function(err)
+                db.run('DELETE FROM cart WHERE user_id = ? AND order_num= ?',[user,orderNum],function(err)
                     {
                         if(err)
                             {
@@ -384,7 +459,6 @@ router.delete('/cart/:user/:orderNum',function(req,res)
         {
             console.log(e)
             res.sendStatus(403)
-
         }
 })
 
