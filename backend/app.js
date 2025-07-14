@@ -12,7 +12,7 @@ const db = new sqlite3.Database('./backend_db.db',(err)=>{})
 const fp_schema = path.join(__dirname,"/DB/schema.sql")
 const fp_seed = path.join(__dirname,"/DB/seed.sql")
 
-console.log(fp_schema)
+
 
 router.get("/initalize",async function(req,res)
     {
@@ -27,12 +27,12 @@ router.get("/initalize",async function(req,res)
                             {
                                 console.log(err)
                                 reject(err);
-                                res.sendStatus(500)
+                                
                             }
                         else
                             {
                                 resolve();
-                                res.sendStatus(200)
+                                
                             }
                     })
             
@@ -55,8 +55,20 @@ router.get("/initalize",async function(req,res)
                             res.sendStatus(200)
                         }
                     })
+                // db.get("SELECT * FROM users",(err,rows)=>
+                // {
+                //     if(err)
+                //     {
+                //         console.log(`The error is here ${err}`)
+                //     }
+                //     else if (rows)
+                //     {
+                //         console.log(JSON.stringify(rows))
+                //     }
+                
+                // })
             })
-        }
+        } 
         catch(e)
         {
             console.log(e)
