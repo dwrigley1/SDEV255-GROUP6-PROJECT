@@ -41,7 +41,7 @@ router.get("/initalize",async function(req,res)
         
         await new Promise((resolve,reject)=>
             {
-                db.exec(sql,function(err)
+                db.exec(sql2,function(err)
                     {
                         if (err)
                             {
