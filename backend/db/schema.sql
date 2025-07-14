@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS cart;
 
 -- teachers and students
 CREATE TABLE users (
@@ -20,4 +21,15 @@ CREATE TABLe courses (
   credits INTEGER NOT NULL,
   creator_id INTEGER NOT NULL,
   FOREIGN KEY (creator_id) REFERENCES users(id)
+);
+
+--keeps track of selections
+
+CREATE TABLE cart (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  course_id INTEGER NOT NULL,
+  order_num TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (course_id) REFERENCES courses(id)
 );

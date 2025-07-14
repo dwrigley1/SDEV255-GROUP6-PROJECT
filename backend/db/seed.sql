@@ -3,8 +3,8 @@ DELETE FROM users;
 
 -- mock users
 INSERT INTO users (id, email, password, first_name, last_name, role) VALUES
-  (1, 'dakota@example.com', 'password123', 'Dakota', 'Smith', 'teacher'),
-  (2, 'fingus@example.com', 'password123', 'Fingus', 'Jones', 'teacher'),
+  (1, 'dakota@example.com', 'password123', 'Dakota', 'Wrigley', 'teacher'),
+  (2, 'fingus@example.com', 'password123', 'Fingus', 'Backend', 'teacher'),
   (3, 'hulk@example.com', 'password123', 'Hulk', 'Hoagie', 'student');
 
 -- inserts courses created by Dakota creator_id=1
