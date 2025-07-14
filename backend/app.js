@@ -8,7 +8,7 @@ const path =require('path');
 app.use(express.json())
 app.use(cors());
 const router = express.Router();
-const db = new sqlite3.Database('./test2.db',(err)=>{})
+const db = new sqlite3.Database('./backend_db.db',(err)=>{})
 const fp_schema = path.join(__dirname,"/DB/schema.sql")
 const fp_seed = path.join(__dirname,"/DB/seed.sql")
 
