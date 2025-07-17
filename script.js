@@ -1,3 +1,5 @@
+/* This is the script that will actually connect the login button to the backend */
+
 document.getElementById("loginForm").addEventListener("submit", function (e) {
   e.preventDefault();
 

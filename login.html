@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Login</title>
+</head>
+
+<body>
+    
+     <div class="">
+        <h1> Scheduler Creator </h1>
+        <h3> Login </h3>
+        <form id="loginForm">
+            <label for="email"> Email </label>
+            <input type="text" id="email">
+            <label for="password"> Password </label>
+            <input type="password" id="password"> 
+        </form>
+        <button onclick="accountLogin()">Login</button>
+        <script>
+        function accountLogin() {
+            const script = document.createElement("script");
+            script.src = "script.js";
+            script.onload = function() {
+                console.log("Script Triggered");
+                alert(' Alert Window');
+            };
+            document.head.appendChild(script);
+            }
+        </script>
+    </div>
+
+<!-- console.log & alert window were only added for debugging purposes to verify login button functionality -->
+
+<p>
+    <a href="createaccount.html" style="text-decoration: none;">
+        No Account? Create One!
+    </a>
+</p>
+<p>
+    <a href="contact.html" style="text-decoration: none;">
+        Click Here For Assistance.
+    </a>
+</p>
+</body>
+</html>
