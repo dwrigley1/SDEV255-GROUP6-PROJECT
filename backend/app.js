@@ -2,18 +2,132 @@
 const express = require("express");
 const sqlite3 = require('sqlite3').verbose();
 var cors= require('cors');
-const app = express();
-const fs = require('fs').promises;
 const path =require('path');
+const fs = require('fs').promises;
+const { OAuth2Client } = require('google-auth-library');
+const session = require('express-session');
+const axios = require('axios');
+require('dotenv').config();
+
+//Load env
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URL = process.env.REDIRECT_URL;
+
+console.log(CLIENT_ID);
+console.log(CLIENT_SECRET);
+console.log(REDIRECT_URL)
+
+
+//middleware
+const app = express();
 app.use(express.json())
 app.use(cors());
+app.use(express.static("backend"))
+app.use(session({
+    secret:'secret-key',
+    resave:false,
+    saveUninitialized:true
+}))
 const router = express.Router();
+
+//DB
 const db = new sqlite3.Database('./backend_db.db',(err)=>{})
 const fp_schema = path.join(__dirname,"/DB/schema.sql")
 const fp_seed = path.join(__dirname,"/DB/seed.sql")
 
+//OAuth
+const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+
+// Get user information
+async function getUserInfo(accessToken) {
+  const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  return response.data;
+}
 
 
+router.get('/test_page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+router.get('/user', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+  res.json(req.session.user);
+}); 
+
+//Call this when validating 
+router.get('/auth/google', (req, res) => {
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: [
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/userinfo.email'
+    ]
+  });
+  
+  res.redirect(authUrl);
+});
+ 
+router.get('/session', async (req, res) => {
+  try {
+    const { code } = req.query;
+    const { tokens } = await oAuth2Client.getToken(code);
+
+    req.session.tokens = tokens;
+    const userInfo = await getUserInfo(tokens.access_token);
+    req.session.user = userInfo;
+    console.log(req.session.user)
+    res.json(req.session)
+
+    //This is what the json looks like of a validated user
+
+        //     {
+        //   "cookie": {
+        //     "originalMaxAge": null,
+        //     "expires": null,
+        //     "httpOnly": true,
+        //     "path": "/"
+        //   },
+        //   "tokens": {
+        //     "access_token": "#",
+        //     "refresh_token": "#",
+        //     "scope": "openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+        //     "token_type": "Bearer",
+        //     "id_token": "#",
+        //     "expiry_date": 1752793881082
+        //   },
+        //   "user": {
+        //     "sub": "#",
+        //     "name": "Sky Savage",
+        //     "given_name": "Sky",
+        //     "family_name": "Savage",
+        //     "picture": "https://lh3.googleusercontent.com/a/ACg8ocIhzMIA1ACzAzNiU1dwYX5KYAN2v4ELpCxj0foMSW22fmh-0Q=s96-c",
+        //     "email": "skysavage55@gmail.com",
+        //     "email_verified": true
+        //   }
+        // }
+
+
+
+    // this is the redirect back to page
+    //res.redirect('/index');
+  } catch (error) {
+    console.error('Error in callback:', error);
+    res.status(500).send('Authentication failed');
+  }
+});
+
+
+
+
+//end of Oauth
+
+
+//Initalize DB Only call on startup
 router.get("/initalize",async function(req,res)
     {
         try{
