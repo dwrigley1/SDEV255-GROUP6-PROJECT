@@ -257,8 +257,9 @@ router.post('/login',function(req,res)
                 {
                     //insert statment
                     console.log(`${email}:${password}:${first_name},${last_name}`)
+                    const id = db.run("SELECT COUNT(id) From users")
                     const insertStmt = db.prepare('INSERT INTO users (id,email,password,first_name,last_name,role) values (?,?,?,?,?,?)')
-                    insertStmt.run(4,email,password,first_name,last_name,role,function(err)
+                    insertStmt.run(id+1,email,password,first_name,last_name,role,function(err)
                         { 
                             if (err)
                                 {
@@ -357,6 +358,49 @@ router.delete('/login/:ID',function(req,res)
 
 
 //courses
+
+router.post('/courses/:userID',function(req,res)
+    {
+        const {userID}= req.params;
+        const queryStmt = db.all('SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher')
+        const {id, name, description, subject, credits} = req.body
+        try
+            {
+                //checks if user is a teacher
+                db.run(queryStmt,userID,function(err)
+                    {
+                        //if not teacher
+                        if(err)
+                            {
+                                console.log(err)
+                                res.sendStatus(500).json({error:err})
+                            }
+                            //if teacher then creates course
+                        else
+                            {
+                               const insertStmt= db.prepare('INSERT INTO courses (id, name, description, subject, credits, creator_id) values (?,?,?,?,?,?)')
+                                insertStmt.run(id, name, description, subject, credits, userID,function(err)
+                                {
+                                    if(err)
+                                        {
+                                            console.log(err)
+                                            res.sendStatus(500).json({error:err})
+                                        }
+                                    else
+                                        {
+                                            res.sendStatus(200)
+                                        }
+                                })
+                            }    
+                    })
+            }
+        catch(e)
+            {
+                console.log(e)
+            }
+    })
+
+
 router.get('/courses/:userID',function(req,res)
     {
         const {userID}= req.params;
@@ -391,18 +435,20 @@ router.get('/courses/:userID',function(req,res)
 
 router.put('/courses/:coursesID',function(req,res)
     {
+        
         //coursesID put in the url 
         const {coursesID} = req.params
-
-        //what will be changed here
+        
+        //what will be changed goes here
         //assuming structure will be {column:value}
-        const completedCourses = req.body
+        const {userID,courseChanges}= req.body;
+
 
         try
             {
-                //inserts completed courses to user
-                console.log(`Value: ${Object.values(completedCourses)[0]} \n ${coursesID}`)
-                db.run(`UPDATE courses SET ${Object.keys(completedCourses)} = ? WHERE id = ?`,[Object.values(completedCourses)[0],coursesID],function(err)
+                //update courses
+                console.log(`Value: ${Object.values(courseChanges)[0]} \n ${coursesID}`)
+                db.run(`UPDATE courses SET ${Object.keys(courseChanges)} = ? WHERE id = ? and creator_id = ?`,[Object.values(courseChanges)[0],coursesID,userID],function(err)
                     {
                         if (err)
                             {
@@ -412,7 +458,7 @@ router.put('/courses/:coursesID',function(req,res)
                         else
                             {
                         
-                                console.log(completedCourses)
+                                console.log(courseChanges)
                                 res.send(200)
                             }
                     })
