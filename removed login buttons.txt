@@ -1,25 +1,12 @@
-<!DOCTYPE html>
-<html>
-<meta charset="UTF-8">
-<head>
-<link rel="stylesheet" href="style.css">
-  <title>Contact Us</title>
-</head>
-<body>
+<!-- 
 
-<div class="topnav">
-  <a href="shoppingcart.html">Shopping Cart</a>
-  <a href="createaccount.html"> No Account? Create One!</a>
-  <a href="index.html">Return Home</a>
-</div>
-
-<!-- student/teacher login buttons -->
+student/teacher login buttons
   <div class="login-buttons">
     <button onclick="document.getElementById('id01').style.display='block'">Teacher Login</button>
     <button onclick="document.getElementById('id02').style.display='block'">Student Login</button>
   </div>
 
-<!-- teacher login -->
+teacher login
 <div id="id01" class="modal">
   <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
   <form class="modal-content animate" action="/action_page.php">
@@ -35,7 +22,7 @@
   </form>
 </div>
 
-<!-- student login -->
+student login
 <div id="id02" class="modal">
   <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
   <form class="modal-content animate" action="/action_page.php">
@@ -50,35 +37,3 @@
     </div>
   </form>
 </div>
-</head>
-
-<div class="container">
-  <form action="action_page.php">
-
-    <label for="fname">First Name</label>
-    <input type="text" id="fname" name="firstname" placeholder="Enter first name ...">
-
-    <label for="lname">Last Name</label>
-    <input type="text" id="lname" name="lastname" placeholder="Enter last name ...">
-
-    <label for="inquiry">How can we help you?</label>
-    <select id="inquiry" name="inquiry">
-      <option value="loginhelp">Login trouble</option>
-      <option value="accounthelp">Creating an account</option>
-      <option value="carthelp">Issues with creating class schedule </option>
-      <option value="otherhelp">Other (please explain below)</option>
-    </select>
-
-    <label for="subject">Subject</label>
-    <textarea id="subject" name="subject" placeholder="Please add any further details that will allow us to help you better." style="height:200px"></textarea>
-
-    <input type="submit" value="Submit">
-
-  </form>
-</div>
-
-</body>
-<footer class="footer">
-        &copy; 2025 Group 6 Class Scheduler
-    </footer>
-</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<head>
+<link rel="stylesheet" href="style.css">
+  <title>Contact Us</title>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="login.html">Back to Login</a>
+</div>
+</head>
+
+<div class="container">
+  <!--
+  <form action="action_page.php">
+    Uncomment if the submit feature is to truly send a request out
+  -->
+
+    <label for="fname">First Name</label>
+    <input type="text" id="fname" name="firstname" placeholder="Enter first name ...">
+
+    <label for="lname">Last Name</label>
+    <input type="text" id="lname" name="lastname" placeholder="Enter last name ...">
+
+    <label for="inquiry">How can we help you?</label>
+    <select id="inquiry" name="inquiry">
+      <option value="loginhelp">Login trouble</option>
+      <option value="accounthelp">Creating an account</option>
+      <option value="carthelp">Issues with creating class schedule </option>
+      <option value="otherhelp">Other (please explain below)</option>
+    </select>
+
+    <!-- <label for="subject">Subject</label> -->
+    <textarea id="subject" name="subject" placeholder="Please add any further details that will allow us to help you better." style="height:200px"></textarea>
+<!--
+    <input type="submit" value="Submit">
+  </form>
+</div> -->
+
+<button onclick="submitRequest('')">Submit Request</button>
+  <script>
+  function submitRequest() {
+    alert(' Your Request Has Been Submitted!');
+  }
+</script>
+
+</body>
+<footer class="footer">
+        &copy; 2025 Group 6 Class Scheduler
+    </footer>
+</html>

@@ -4,51 +4,15 @@
   <title>Class Scheduler</title>
 </head>
 
+
 <body>
+  <script src="script.js"></script>
+
   <!-- nav bar -->
   <div class="topnav">
     <a href="shoppingcart.html">Shopping Cart</a>
     <a href="contact.html">Contact Us</a>
-    <a href="createaccount.html">No Account? Create One!</a>
   </div>
-
-  <!-- student/teacher login buttons -->
-  <div class="login-buttons">
-    <button onclick="document.getElementById('id01').style.display='block'">Teacher Login</button>
-    <button onclick="document.getElementById('id02').style.display='block'">Student Login</button>
-  </div>
-
-<!-- teacher login -->
-<div id="id01" class="modal">
-  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
-  <form class="modal-content animate" action="/action_page.php">
-    <div class="container">
-      <h3>Teacher Login</h3>
-      <label for="uname">Username</label><br>
-      <input type="text" placeholder="Enter Username" name="uname" required><br>
-      <label for="psw">Password</label><br>
-      <input type="password" placeholder="Enter Password" name="psw" required><br>
-      <button type="submit">Login</button>
-      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-    </div>
-  </form>
-</div>
-
-<!-- student login -->
-<div id="id02" class="modal">
-  <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
-  <form class="modal-content animate" action="/action_page.php">
-    <div class="container">
-      <h3>Student Login</h3>
-      <label for="uname">Username</label><br>
-      <input type="text" placeholder="Enter Username" name="uname" required><br>
-      <label for="psw">Password</label><br>
-      <input type="password" placeholder="Enter Password" name="psw" required><br>
-      <button type="submit">Login</button>
-      <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
-    </div>
-  </form>
-</div>
 </head>
   
   <!-- course selection -->
