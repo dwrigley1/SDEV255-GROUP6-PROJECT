@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS enrollment;
 
 -- teachers and students
 CREATE TABLE users (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE, -- log in identity
   password TEXT NOT NULL,
   first_name TEXT,
@@ -15,7 +15,7 @@ CREATE TABLE users (
 
 -- created by teachers
 CREATE TABLE courses (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   subject TEXT NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE courses (
 --keeps track of selections
 
 CREATE TABLE cart (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   course_id INTEGER NOT NULL,
   order_num TEXT NOT NULL,
