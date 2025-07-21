@@ -12,7 +12,8 @@ async function addCourse(){
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
     }
-    const response = await fetch(" ENTER URL HERE ",{
+    
+    const response = await fetch(`./api/courses/${user_id}`,{
         method: "POST",
         headers:{
             "Content-Type" : "application/json"
@@ -37,7 +38,7 @@ async function deleteCourse(){
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
     }
-    const response = await fetch(" ENTER URL HERE ",{
+    const response = await fetch(`./api/courses/${course.courseId}`,{
         method: "DELETE",
         headers:{
             "Content-Type" : "application/json"
@@ -62,7 +63,7 @@ async function editCourse(){
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
     }
-    const response = await fetch("ENTER URL HERE",{
+    const response = await fetch(`./api/courses/${course.courseId}/${user_id}`,{
         method: "PUT",
         headers:{
             "Content-Type" : "application/json"
