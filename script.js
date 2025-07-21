@@ -1,7 +1,12 @@
 /* This is the script that will actually connect the login button to the backend */
-/** 
 
-  fetch(`https://sdev255-group6-project.onrender.com/api/login/${email}/${password}`)
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  await fetch(`https://sdev255-group6-project.onrender.com/api/login/${email}/${password}`)
     .then(res => res.json())
     .then(data => {
       console.log("Login success:", data);
