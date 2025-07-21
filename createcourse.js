@@ -13,7 +13,7 @@ async function addCourse(){
         description: document.querySelector("#description").value,
     }
     
-    const response = await fetch(`./api/courses/${user_id}`,{
+    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${user_id}`,{
         method: "POST",
         headers:{
             "Content-Type" : "application/json"
@@ -38,7 +38,7 @@ async function deleteCourse(){
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
     }
-    const response = await fetch(`./api/courses/${course.courseId}`,{
+    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${course.courseId}`,{
         method: "DELETE",
         headers:{
             "Content-Type" : "application/json"
@@ -63,7 +63,7 @@ async function editCourse(){
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
     }
-    const response = await fetch(`./api/courses/${course.courseId}/${user_id}`,{
+    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${course.courseId}/${user_id}`,{
         method: "PUT",
         headers:{
             "Content-Type" : "application/json"
