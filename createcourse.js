@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#editBtn").addEventListener("click", editCourse);
 });
 
+const user_id = sessionStorage.getItem("user_id"); // new const variable
+
+
 // add a course //
 async function addCourse(){
     const course = {
@@ -11,6 +14,7 @@ async function addCourse(){
         subject: document.querySelector("#subject").value,
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
+        creator_id: user_id
     }
     
     const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${user_id}`,{
@@ -37,6 +41,7 @@ async function deleteCourse(){
         subject: document.querySelector("#subject").value,
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
+        creator_id: user_id
     }
     const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${course.courseId}`,{
         method: "DELETE",
@@ -62,6 +67,7 @@ async function editCourse(){
         subject: document.querySelector("#subject").value,
         creditHours: document.querySelector("#creditHours").value,
         description: document.querySelector("#description").value,
+        creator_id: user_id
     }
     const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${course.courseId}/${user_id}`,{
         method: "PUT",
