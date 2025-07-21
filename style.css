@@ -1,264 +1,211 @@
-input[type=text], select {
-  width: 50%;
-  padding: 12px 10px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/* Reset and Base Styles */
+* {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-input[type=submit] {
-  width: 100%;
-  background-color: #234e25;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f3f3f3;
+  color: #333;
+  line-height: 1.6;
 }
 
-input[type=submit]:hover {
-  background-color: #45a049;
-}
-
-div {
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  padding: 20px;
-}
-
-/* nav bar begin */
-
-.box {
-  box-sizing: border-box;
-}
-
-/* header style */
-.header {
-  background-color: #f1f1f1;
-  padding: 20px;
-  text-align: right;
-}
-
-/* nav bar style */
+/* Nav Bar */
 .topnav {
-  overflow: hidden;
   background-color: #234e25;
-  
-}
-
-/* nav bar links */
-.topnav a {
-  float: right;
-  display: block;
-  color: #f2f2f2;
+  padding: 10px 0;
   text-align: center;
-  padding: 14px 25px;
-  text-decoration: none;
 }
 
-/* options change color when cursor is hovered over*/
+.topnav a {
+  color: #f2f2f2;
+  text-decoration: none;
+  padding: 14px 20px;
+  display: inline-block;
+  font-weight: 600;
+}
+
 .topnav a:hover {
   background-color: #45a049;
   color: black;
-}
-/* nav bar end */
-
-/* modal form begin */
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1; 
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.4); 
-  padding-top: 60px;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 5px auto; 
-  border: 1px solid #888;
-  width: 40%; 
-}
-
-/* zoom effect for modal form*/
-.animate {
-  -webkit-animation: animatezoom 0.6s;
-  animation: animatezoom 0.6s
-}
-
-@-webkit-keyframes animatezoom {
-  from {-webkit-transform: scale(0)}
-  to {-webkit-transform: scale(1)}
-}
-
-@keyframes animatezoom {
-  from {transform: scale(0)}
-  to {transform: scale(1)}
-}
-/* modal form end */
-
-/* teacher/student login buttons begin*/
-.login-buttons {
-display: flex;
-justify-content: flex-end;
-padding: 10px;
-gap: 10px;
-}
-
-.login-buttons button {
-padding: 8px 16px;
-background-color: #234e25;
-color: white;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-}
-
-.login-buttons button:hover {
-  background-color: #45a049;
-}
-/* teacher/student login buttons end*/
-
-/* course selection cards on index page begin */
-.course-section {
-  max-width: 800px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.course-section h2 {
-  text-align: center;
-  color: #234e25;
-}
-
-.course-card {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-}
-
-.course-card h4 {
-  margin-bottom: 8px;
-}
-/* course selection cards on index page end */
-
-/* contact us form begin */
-input[type=text], select, textarea {
-  width: 100%; 
-  padding: 12px;  
-  border: 1px solid #ccc; 
-  border-radius: 4px; 
-  box-sizing: border-box; 
-  margin-top: 6px; 
-  margin-bottom: 16px; 
-  resize: vertical 
-}
-
-/* the submit button itself  */
-input[type=submit] {
-  background-color: #234e25;
-  color: white;
-  padding: 12px 20px;
-  border: none;
   border-radius: 4px;
-  cursor: pointer;
-}
-/* color changes when cursor is hovered over it */
-input[type=submit]:hover {
-  background-color: #45a049;
-  color: black;
 }
 
-.container {
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  padding: 20px;
-}
-/* contact us form begin */
-
-/* Login Page Begin */
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: sans-serif;
-    line-height: 1.5;
-    min-height: 100vh;
-    background: #f3f3f3;
-    flex-direction: column;
-    margin: 0;
-}
-
+/* Main Content Box */
 .main {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    padding: 10px 20px;
-    transition: transform 0.2s;
-    width: 500px;
-    text-align: center;
+  background-color: #fff;
+  max-width: 500px;
+  width: 90%;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    color: #4CAF50;
+  text-align: center;
+  color: #234e25;
+  margin-bottom: 25px;
 }
 
-label {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    text-align: left;
-    color: #555;
-    font-weight: bold;
+form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
-input {
-    display: block;
-    width: 100%;
-    margin-bottom: 15px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="number"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
-button {
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    border: none;
-    color: white;
-    cursor: pointer;
-    background-color: #45a049;
-    width: 100%;
-    font-size: 16px;
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
 }
 
-.wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+button,
+input[type="submit"] {
+  padding: 12px;
+  border-radius: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/* Login Page End */
+button:hover,
+input[type="submit"]:hover {
+  background-color: #45a049;
+}
 
-/* Footer begin */
+#addBtn {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+#editBtn {
+  background-color: #2196F3; /* Blue */
+  color: white;
+}
+
+#deleteBtn {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.remove-btn {
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.remove-btn:hover {
+  background-color: #d32f2f;
+}
+
+.confirm-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px;
+  margin-top: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.confirm-btn:hover {
+  background-color: #45a049;
+}
+
+
+#error {
+  margin-top: 15px;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Course Grid Section */
+.course-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+}
+
+.course-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+  height: 100%;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+}
+
+.course-card h4 {
+  margin-bottom: 10px;
+  color: #234e25;
+}
+
+.course-card p {
+  flex-grow: 1;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+.course-card button {
+  align-self: stretch;
+  background-color: #234e25;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+.course-card button:hover {
+  background-color: #45a049;
+}
+
+/* Footer */
 .footer {
-    /* background-color
-    color: #FFFFFF; */
-    padding: 15px;
-    text-align: center;
+  padding: 15px;
+  text-align: center;
+  color: #333;
+  font-size: 0.9rem;
+  margin-top: auto;
 }
-/* Footer end */

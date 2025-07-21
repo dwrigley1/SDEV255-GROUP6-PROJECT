@@ -1,48 +1,53 @@
-<DOCTYPE html>
-<html>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="style.css">
-  <title>Class Scheduler</title>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<body>
-<div class="topnav">
-  <a href="contact.html">Contact Us</a>
-  <a href="index.html">Return Home</a>
-</div>
-</div>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Scheduler - Shopping Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<body>
-  <h2>Shopping Cart</h2>
-  <ul id="cart-list"></ul>
+  <div class="topnav">
+    <a href="contact.html">Contact Us</a>
+    <a href="index.html">Return Home</a>
+  </div>
 
-  <script> 
-  /* this function clears the cart */
+  <div class="main">
+    <h1>Shopping Cart</h1>
+    <ul id="cart-list"></ul>
+
+    <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
+
+  </div>
+
+  <script>
     function loadCart() {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       const cartList = document.getElementById('cart-list');
       cartList.innerHTML = '';
-      /* inform user cart is empty */
-    if (cart.length === 0) {
-      const emptyMessage = document.createElement('p');
-      emptyMessage.textContent = 'Shopping Cart is Empty!';
-      cartList.appendChild(emptyMessage);
-    } else {
-      cart.forEach((course, index) => {
-        const li = document.createElement('li');
-        li.textContent = course + ' ';
-        
-        /* the remove button to trigger the function */
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => removeCourse(index);
-        li.appendChild(removeBtn);
-        cartList.appendChild(li);
-      });
+
+      if (cart.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.textContent = 'Shopping Cart is Empty!';
+        cartList.appendChild(emptyMessage);
+      } else {
+        cart.forEach((course, index) => {
+          const li = document.createElement('li');
+          li.textContent = course + ' ';
+
+          
+
+          const removeBtn = document.createElement('button');
+          removeBtn.classList.add('remove-btn');
+          removeBtn.textContent = 'Remove';
+          removeBtn.onclick = () => removeCourse(index);
+          li.appendChild(removeBtn);
+          cartList.appendChild(li);
+        });
+      }
     }
-  }
-    /* this function allows an individual course to be removed */
+
     function removeCourse(index) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart.splice(index, 1);
@@ -50,19 +55,15 @@
       loadCart();
     }
 
+    function confirmSchedule() {
+      alert('Schedule Confirmed!');
+    }
+
     loadCart();
   </script>
+
+  <footer class="footer">
+    &copy; 2025 Group 6 Class Scheduler
+  </footer>
 </body>
-
-<!-- This will need the logic to actually check to see if it satisfies all parameters to allow the schedule to be -->
-<button onclick="confirmSchedule('')">Confirm Schedule</button>
-  <script>
-  function confirmSchedule() {
-    alert(' Schedule Confirmed!');
-  }
-</script>
-
-<footer class="footer">
-        &copy; 2025 Group 6 Class Scheduler
-    </footer>
 </html>
