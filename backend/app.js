@@ -31,8 +31,19 @@ console.log(REDIRECT_URL)
 
 //middleware
 const app = express();
-app.use(express.json())
-app.use(cors());
+app.use(express.json());
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'https://dwrigley1.github.io/SDEV255-GROUP6-PROJECT',
+    'https://dwrigley1.github.io',
+    'https://sdev255-group6-project.onrender.com'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.static("backend"))
 app.use(session({
     secret:'secret-key',
