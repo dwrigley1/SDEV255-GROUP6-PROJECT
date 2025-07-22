@@ -1,4 +1,14 @@
+//backend logic requirements for stage 2 – A login system should be implemented
+// – Authorization should be differentiated between students and teachers
+// Teachers should be able to add and drop courses to the available classes listing
+// Students should be able to add courses to their schedule
+// Students should be able to drop classes from their schedule
+
+
+
 //Requirements
+const CryptoJS = require("crypto-js"); 
+const crypto = require('crypto');
 const express = require("express");
 const sqlite3 = require('sqlite3').verbose();
 var cors= require('cors');
@@ -200,6 +210,10 @@ router.get("/initalize",async function(req,res)
 //login and validation
 router.get('/login/:email/:password',function(req,res)
     {
+        // how to decrypt the token
+        // const bytes = CryptoJS.AES.decrypt(encryptedToken, secretKey);
+        // const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+        // console.log("Decrypted Token:", decryptedToken);
         
         const {email,password} = req.params
             try
@@ -211,12 +225,13 @@ router.get('/login/:email/:password',function(req,res)
                             if (err)
                                 {
                                     console.log(`Oh man there was an error :${err}`)
-                                    res.sendStatus(500).json({error:err})
+                                    res.status(500).send({error:err})
                                 }
                             else if (row)
                                 {
-                                    console.log(row.first_name)
-                                    res.sendStatus(200)
+                                    const secretKey = "dakota_hulk_fingus";
+                                    const token = `id:${row.id},email:${row.email},password:${row.password}`;
+                                    const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();   
                                 }
                             else
                                 {
@@ -264,7 +279,7 @@ router.post('/login',function(req,res)
                             if (err)
                                 {
                                     console.error("Error inserting change:",err)
-                                    res.sendStatus(500).json({error:err})
+                                    res.status(500).send({error:err})
                                 }
                             else 
                                 {
@@ -314,7 +329,7 @@ router.put('/login/:email/',function(req,res)
                     {
                         if (errors.length>0)
                             {
-                                return res.sendStatus(500).json({errors:errors})
+                                return res.status(500).send({errors:errors})
                             }
                         else
                         {
@@ -339,7 +354,7 @@ router.delete('/login/:ID',function(req,res)
                         if(err)
                             {
                                 console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                         else
                             {
@@ -373,7 +388,7 @@ router.post('/courses/:userID',function(req,res)
                         if(err)
                             {
                                 console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                             //if teacher then creates course
                         else
@@ -384,7 +399,7 @@ router.post('/courses/:userID',function(req,res)
                                     if(err)
                                         {
                                             console.log(err)
-                                            res.sendStatus(500).json({error:err})
+                                            res.status(500).send({error:err})
                                         }
                                     else
                                         {
@@ -412,7 +427,7 @@ router.get('/courses/:userID',function(req,res)
                         if(err)
                             {
                                 console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                         else if (row)
                             {
@@ -433,15 +448,15 @@ router.get('/courses/:userID',function(req,res)
 
 
 
-router.put('/courses/:coursesID',function(req,res)
+router.put('/courses/:coursesID/:userID',function(req,res)
     {
         
         //coursesID put in the url 
-        const {coursesID} = req.params
+        const {userID,coursesID} = req.params
         
         //what will be changed goes here
         //assuming structure will be {column:value}
-        const {userID,courseChanges}= req.body;
+        const {courseChanges}= req.body;
 
 
         try
@@ -453,7 +468,7 @@ router.put('/courses/:coursesID',function(req,res)
                         if (err)
                             {
                                 console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                         else
                             {
@@ -480,7 +495,7 @@ router.put('/courses/:coursesID',function(req,res)
                         if (err)
                             {
                                 console.log(err)
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                         else
                             {
@@ -538,7 +553,7 @@ router.post('/cart/:user/:orderNum/',function(req,res)
                                     {
                                         if (errors.length>0)
                                             {
-                                                return res.sendStatus(500).json({error:errors})
+                                                return res.status(500).send({error:errors})
                                             }
                                         else
                                             {
@@ -615,7 +630,7 @@ router.put('/cart/:user_id/:orderNum',function(req,res)
                     {
                         if (errors.length>0)
                             {
-                                return res.sendStatus(500).json({errors:errors})
+                                return res.status(500).send({errors:errors})
                             }
                         else
                         {
@@ -642,7 +657,7 @@ router.delete('/cart/:user/:orderNum',function(req,res)
                             {
                                 console.log(err)
                                 //sends a json of the issue and a 500 status
-                                res.sendStatus(500).json({error:err})
+                                res.status(500).send({error:err})
                             }
                         else
                             {
