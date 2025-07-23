@@ -148,8 +148,8 @@ router.get('/session', async (req, res) => {
 //end of Oauth
 
 
-//Initalize DB Only call on startup
-router.get("/initalize",async function(req,res)
+//initialize DB Only call on startup
+router.get("/initialize",async function(req,res)
     {
         try{
         const sql = await fs.readFile(fp_schema,"utf8");
