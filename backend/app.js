@@ -215,6 +215,69 @@ router.get("/initialize",async function(req,res)
     })
 
 
+//auth
+router.post("/auth/:minAuth",function(req,res){
+    try
+        {
+            const{minAuth} = req.params.minAuth
+
+            const bytes = CryptoJS.AES.decrypt(req.body.token, secretKey);
+            const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+            console.log("Decrypted Token:", decryptedToken);
+            const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+            const{id,email,password,role} = (new_params)
+            if(!id || !email || !password ||!role)
+                {
+                    res.status(503).send({error:"Missing id/email/password/role"})
+                    return
+                }
+            else
+                {
+                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
+                    {
+                        if(err)
+                            {
+                                res.send(501).send({error:err})
+                            }
+                        else if(row)
+                            {
+                                if(row.role!=role)
+                                    {
+                                        console.log(`DB role: ${row.role} != Provided Role :${role}`)
+                                        res.send(400).send({error:"Dont lie"})
+                                    }
+                                else if(minAuth=="teacher" && role!="teacher")
+                                    {
+                                        console.log(`MinAuth :${minAuth} != Role: ${role}`)
+                                        res.send(501).send({auth:false})
+                                    }
+                                else
+                                    {
+                                        console.log(`${id} is approved for content`)
+                                        res.send(200).send({auth:true})
+                                    }
+                            }
+
+
+                    })
+
+                }
+
+
+
+
+        }
+    catch(err)
+        {
+
+
+        }
+
+
+
+})
+
+
 
 
 
@@ -229,7 +292,7 @@ router.get('/login/:email/:password',function(req,res)
         const {email,password} = req.params
             try
                 {
-                    //Example query for login check
+                    
                     console.log(`${email}:${password}`)
                     const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
                         {
@@ -241,8 +304,9 @@ router.get('/login/:email/:password',function(req,res)
                             else if (row)
                                 {
                                     const secretKey = "dakota_hulk_fingus";
-                                    const token = `id:${row.id},email:${row.email},password:${row.password}`;
-                                    const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();   
+                                    const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
+                                    const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
+                                    res.status(200).send({token:encryptedToken})
                                 }
                             else
                                 {
