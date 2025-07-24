@@ -152,27 +152,31 @@ router.get('/session', async (req, res) => {
 //initialize DB Only call on startup
 router.get("/initialize",async function(req,res)
     {
-        try{
-        const sql = await fs.readFile(fp_schema,"utf8");
-        
-        await new Promise((resolve,reject)=>
+        try
             {
-                db.exec(sql,function(err)
+                
+                const sql = await fs.readFile(fp_schema,"utf8");
+                console.log("starting up schema")
+                await new Promise((resolve,reject)=>
                     {
-                        if (err)
+                        db.exec(sql,function(err)
                             {
-                                console.log(err)
-                                reject(err);
-                                
-                            }
-                        else
-                            {
-                                resolve();
-                                
-                            }
+                                if (err)
+                                    {
+                                        console.log(err)
+                                        reject(err);
+                                        
+                                    }
+                                else
+                                    {
+                                        console.log("resolved schema")
+                                        resolve();
+                                        
+                                    }
+                            })
+                    
                     })
-            
-                })
+        console.log("Reading seed")
         const sql2 = await fs.readFile(fp_seed,"utf8");
         
         await new Promise((resolve,reject)=>
@@ -187,6 +191,7 @@ router.get("/initialize",async function(req,res)
                             }
                         else
                         {
+                            console.log("resolving seed")
                             resolve();
                             res.sendStatus(200)
                         }
@@ -217,66 +222,64 @@ router.get("/initialize",async function(req,res)
 
 
 //auth
-router.post("/auth/:minAuth",function(req,res){
-    try
-        {
-            const{minAuth} = req.params.minAuth
+router.post("/auth/:minAuth",function(req,res)
+    {
+        try
+            {
+                const{minAuth} = req.params.minAuth
 
-            const bytes = CryptoJS.AES.decrypt(req.body.token, secretKey);
-            const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
-            console.log("Decrypted Token:", decryptedToken);
-            const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
-            const{id,email,password,role} = (new_params)
-            if(!id || !email || !password ||!role)
-                {
-                    res.status(503).send({error:"Missing id/email/password/role"})
-                    return
-                }
-            else
-                {
-                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
+                const bytes = CryptoJS.AES.decrypt(req.body.token, secretKey);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
                     {
-                        if(err)
-                            {
-                                res.send(501).send({error:err})
-                            }
-                        else if(row)
-                            {
-                                if(row.role!=role)
-                                    {
-                                        console.log(`DB role: ${row.role} != Provided Role :${role}`)
-                                        res.send(400).send({error:"Dont lie"})
-                                    }
-                                else if(minAuth=="teacher" && role!="teacher")
-                                    {
-                                        console.log(`MinAuth :${minAuth} != Role: ${role}`)
-                                        res.send(501).send({auth:false})
-                                    }
-                                else
-                                    {
-                                        console.log(`${id} is approved for content`)
-                                        res.send(200).send({auth:true})
-                                    }
-                            }
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                else
+                    {
+                        const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
+                        {
+                            if(err)
+                                {
+                                    res.send(501).send({error:err})
+                                }
+                            else if(row)
+                                {
+                                    if(row.role!=role)
+                                        {
+                                            console.log(`DB role: ${row.role} != Provided Role :${role}`)
+                                            res.send(400).send({error:"Dont lie"})
+                                        }
+                                    else if(minAuth=="teacher" && role!="teacher")
+                                        {
+                                            console.log(`MinAuth :${minAuth} != Role: ${role}`)
+                                            res.send(501).send({auth:false})
+                                        }
+                                    else
+                                        {
+                                            console.log(`${id} is approved for content`)
+                                            res.send(200).send({auth:true})
+                                        }
+                                }
 
 
-                    })
+                        })
 
-                }
-
-
-
-
-        }
-    catch(err)
-        {
-
-
-        }
+                    }
 
 
 
-})
+
+            }
+        catch(err)
+            {
+
+
+            }
+    })
 
 
 
@@ -509,7 +512,7 @@ router.get('/courses/:userID',function(req,res)
                             }
                         else if (row)
                             {
-                                res.json(row)
+                                res.status(200).send(row)
                             }
                         else
                             {
