@@ -17,6 +17,7 @@ const fs = require('fs').promises;
 const { OAuth2Client } = require('google-auth-library');
 const session = require('express-session');
 const axios = require('axios');
+const { env } = require("process");
 require('dotenv').config();
 
 //Load env
@@ -294,8 +295,9 @@ router.get('/login/:email/:password',function(req,res)
                 {
                     
                     console.log(`${email}:${password}`)
-                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
+                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],(err,row)=>
                         {
+                            console.log("Callback function for login querystatment is starting")
                             if (err)
                                 {
                                     console.log(`Oh man there was an error :${err}`)
@@ -303,6 +305,7 @@ router.get('/login/:email/:password',function(req,res)
                                 }
                             else if (row)
                                 {
+                                    console.log(`${row} was found`)
                                     const secretKey = "dakota_hulk_fingus";
                                     const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
                                     const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
@@ -750,4 +753,7 @@ router.delete('/cart/:user/:orderNum',function(req,res)
 
 
 app.use("/api",router)
-app.listen(3000)
+
+port =( env.process.PORT || 3000)
+
+app.listen(port)
