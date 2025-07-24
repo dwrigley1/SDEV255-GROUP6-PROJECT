@@ -759,4 +759,4 @@ app.use("/api",router)
 
 port =( env.process.PORT || 3000)
 
-app.listen(port)
+app.listen(port,()=>{console.log(`Server running on ${port}`)})
