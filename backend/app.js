@@ -757,6 +757,6 @@ router.delete('/cart/:user/:orderNum',function(req,res)
 
 app.use("/api",router)
 
-port =( env.process.PORT || 3000)
+port = 3000
 
 app.listen(port,()=>{console.log(`Server running on ${port}`)})
