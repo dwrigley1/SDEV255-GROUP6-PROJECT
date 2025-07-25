@@ -747,16 +747,16 @@ router.delete('/cart/:user/:orderNum',function(req,res)
             res.sendStatus(403)
         }
 })
-
+ 
 //Enrollment
-router.post("/eroll",function(req,res)
+router.post("/enroll",function(req,res)
 // needs body params of {"user_id":"user_id_goes_here", "courseID":"courseID_goes_here"}
     {
         try
             {
                 const {user_id,courseID} = req.body
-                if(!user_id|| courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
-                db.run("INSERT into enrollment(user_id,course_id)",[user_id,courseID],function(err)
+                if(!user_id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
+                db.run("INSERT into enrollment(user_id,course_id) values (?,?)",[user_id,courseID],function(err)
                     {
                         if(err)
                             {
@@ -785,11 +785,13 @@ router.get("/enroll",function(req,res)
         try
             {
                 const {user_id} = req.body
+                console.log("ID: "+user_id)
                 if(!user_id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
-                db.run("SELECT * from enrollment WHERE user_id = ?",[user_id],function(err,row)
+                db.all("SELECT * from enrollment WHERE user_id = ?",[user_id],function(err,row)
                     {
                         if(err)
                             {
+                                console.log(err)
                                 res.status(500).send(err);return
                             } 
                         else if(row)
@@ -810,8 +812,8 @@ router.get("/enroll",function(req,res)
 
     })
 
-    
-router.put("/eroll/:user_id",function(req,res)
+
+router.put("/enroll/:user_id",function(req,res)
     {
         {
         //Any changes goes in the req.body
@@ -861,7 +863,7 @@ router.put("/eroll/:user_id",function(req,res)
 
     
 //Dont use yet
-router.delete("/eroll/:userID",function(req,res)
+router.delete("/enroll/:userID",function(req,res)
     {
         try
             {
