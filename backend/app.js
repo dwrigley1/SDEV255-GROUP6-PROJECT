@@ -355,7 +355,7 @@ router.post('/login',function(req,res)
             try
                 {
                     //insert statment
-                    console.log(`${email}:${password}:${first_name},${last_name}`)
+                    console.log(`${email}:${password}:${first_name},${last_name} inserting into users`)
                     //const created_id = db.run("SELECT COUNT(id) From users")
                     const insertStmt = db.prepare('INSERT INTO users (email,password,first_name,last_name,role) values (?,?,?,?,?)')
                     insertStmt.run(email,password,first_name,last_name,role,function(err)
@@ -386,40 +386,30 @@ router.put('/login/:email/',function(req,res)
         const {email}= req.params
         const changes = req.body
         // struture for puts are {column:value}
-       
+       console.log(changes)
         try
             {   let errors = []
                 let updated = 0
-                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                //console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
                 for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
-                        console.log(i)
-                        db.run(`UPDATE users SET ${Object.keys(changes)[i]}= ? WHERE email = ?`,[Object.values(changes)[i],email],function(err)
+                        console.log(i,Object.keys(changes)[i])
+                        db.run(`UPDATE users SET ${Object.keys(changes)[i]}= ? WHERE email = ?`,[Object.values(changes)[i],email],(err)=>
                             { 
                                 if(err)
                                     {
-                                        errors.push(err)
+                                        console.log(err)
+                                        res.status(500).send(err)
                                     }
                                 else
                                     {
-                                        console.log("test", updated)
-                                        updated += 1;
+                                        console.log("test", updated)  
                                     }
                             })
                             
                     }
-                console.log(`Updated: ${updated}:Errors ${errors.length}`)
-                if (updated+errors.length==Object.keys(changes).length-1)
-                    {
-                        if (errors.length>0)
-                            {
-                                return res.status(500).send({errors:errors})
-                            }
-                        else
-                        {
-                            return res.sendStatus(200)
-                        }
-                    } 
+                console.log(`If it existed it changed`)
+                res.sendStatus(200)
 
             }   
         catch(e)
@@ -433,7 +423,7 @@ router.delete('/login/:ID',function(req,res)
         const {ID} = req.params
         try
             {
-                db.run(`DELETE FROM user WHERE ID =?`,[userID],function(err)
+                db.run(`DELETE FROM users WHERE ID =?`,[ID],function(err)
                     {
                         if(err)
                             {
@@ -443,7 +433,6 @@ router.delete('/login/:ID',function(req,res)
                         else
                             {
                                 res.sendStatus(200)
-
                             }    
                     })
             }
@@ -461,12 +450,14 @@ router.delete('/login/:ID',function(req,res)
 router.post('/courses/:userID',function(req,res)
     {
         const {userID}= req.params;
-        const queryStmt = db.all('SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher')
+        //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
+        if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
         try
             {
+
                 //checks if user is a teacher
-                db.run(queryStmt,userID,function(err)
+                db.run(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = "teacher" `,userID,function(err)
                     {
                         //if not teacher
                         if(err)
@@ -478,7 +469,7 @@ router.post('/courses/:userID',function(req,res)
                         else
                             {
                                const insertStmt= db.prepare('INSERT INTO courses ( name, description, subject, credits, creator_id) values (?,?,?,?,?)')
-                                insertStmt.run(id, name, description, subject, credits, userID,function(err)
+                                insertStmt.run( name, description, subject, credits, userID,function(err)
                                 {
                                     if(err)
                                         {
@@ -755,6 +746,41 @@ router.delete('/cart/:user/:orderNum',function(req,res)
             res.sendStatus(403)
         }
 })
+
+//Enrollment
+router.post("/eroll",function(req,res){
+
+
+
+
+
+})
+
+
+
+router.get("/enroll",function(req,res){
+
+
+
+
+
+})
+router.put("/eroll",function(req,res){
+
+
+
+
+
+})
+
+router.delete("/eroll",function(req,res){
+
+
+
+
+
+})
+
 
 
 

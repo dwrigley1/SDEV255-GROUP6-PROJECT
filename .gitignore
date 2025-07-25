@@ -142,3 +142,6 @@ vite.config.ts.timestamp-*
 #Test DB
 test.db
 test2.db
+backend/.db
+backend/backend_db.db
+backend/backend_db.db
