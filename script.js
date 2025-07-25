@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem("token",response.token)
       const token = localStorage.getItem('token');
       console.log(token)
-      //window.location.href = './index.html';
+      window.location.href = '/index.html';
       const data = await response.json();
       console.log("Login success:", data);
   });
