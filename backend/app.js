@@ -21,9 +21,13 @@ const { env } = require("process");
 require('dotenv').config();
 
 //Load env
+
+const SECRET_KEY = process.env.SECRET_KEY
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URL = process.env.REDIRECT_URL;
+
+//console.log("Secret Key: "+SECRET_KEY)
 
 console.log(CLIENT_ID);
 console.log(CLIENT_SECRET);
@@ -228,7 +232,7 @@ router.post("/auth/:minAuth",function(req,res)
             {
                 const{minAuth} = req.params.minAuth
 
-                const bytes = CryptoJS.AES.decrypt(req.body.token, secretKey);
+                const bytes = CryptoJS.AES.decrypt(req.body.token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
                 const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
@@ -308,10 +312,9 @@ router.get('/login/:email/:password',function(req,res)
                                 }
                             else if (row)
                                 {
-                                    console.log(`${row} was found`)
-                                    const secretKey = "dakota_hulk_fingus";
+                                    console.log(`${JSON.stringify(row)} was found`)
                                     const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
-                                    const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
+                                    const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
                                     res.status(200).send({token:encryptedToken})
                                 }
                             else
