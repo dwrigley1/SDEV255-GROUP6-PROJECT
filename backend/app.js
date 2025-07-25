@@ -358,7 +358,7 @@ router.post('/login',function(req,res)
                     console.log(`${email}:${password}:${first_name},${last_name}`)
                     //const created_id = db.run("SELECT COUNT(id) From users")
                     const insertStmt = db.prepare('INSERT INTO users (email,password,first_name,last_name,role) values (?,?,?,?,?)')
-                    insertStmt.run(id,email,password,first_name,last_name,role,function(err)
+                    insertStmt.run(email,password,first_name,last_name,role,function(err)
                         { 
                             if (err)
                                 {
