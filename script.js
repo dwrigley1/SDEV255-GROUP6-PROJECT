@@ -3,7 +3,7 @@
 // new async function //
 
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  document.getElementById("loginForm").addEventListener("login", async function (e) {
     e.preventDefault();
 
     const email = document.getElementById("email").value;
