@@ -594,7 +594,7 @@ router.put('/courses/:coursesID/:userID',function(req,res)
 router.post('/cart/:user/:orderNum/',function(req,res)
     {
         const {user,orderNum}= req.params
-        //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
+        //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]} in the body        
         const {coursesID} = req.body
         
         try
@@ -675,6 +675,7 @@ router.get('/cart/:user_id/:orderNum',function(req,res)
 
 router.put('/cart/:user_id/:orderNum',function(req,res)
     {
+        //Any changes goes in the req.body
         const {user_id,orderNum} = req.params
         const changes = req.body
       
@@ -748,38 +749,139 @@ router.delete('/cart/:user/:orderNum',function(req,res)
 })
 
 //Enrollment
-router.post("/eroll",function(req,res){
+router.post("/eroll",function(req,res)
+// needs body params of {"user_id":"user_id_goes_here", "courseID":"courseID_goes_here"}
+    {
+        try
+            {
+                const {user_id,courseID} = req.body
+                if(!user_id|| courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
+                db.run("INSERT into enrollment(user_id,course_id)",[user_id,courseID],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(505).send(err)
+                            }
+                        else
+                            {
+                                res.status(200).send({"Status":"Success"})
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        })
 
 
 
+router.get("/enroll",function(req,res)
+// Needs a body param of 
+//    {user_id:"user_id_goes_here"}
+    {
+        try
+            {
+                const {user_id} = req.body
+                if(!user_id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
+                db.run("SELECT * from enrollment WHERE user_id = ?",[user_id],function(err,row)
+                    {
+                        if(err)
+                            {
+                                res.status(500).send(err);return
+                            } 
+                        else if(row)
+                            {
+                                res.status(200).send(row)
+                            }
+                        else
+                            {
+                                res.status(404).send("Nothing to see here")
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                req.send(err)
+            }
+
+    })
+
+    
+router.put("/eroll/:user_id",function(req,res)
+    {
+        {
+        //Any changes goes in the req.body
+        const {user_id} = req.params
+        const changes = req.body
+        try
+            {   let errors = []
+                let updated = 0
+                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                for (let i=0;i<=Object.keys(changes).length-1;i++)
+                    {
+                        console.log(i)
+                        db.run(`UPDATE enrollment SET ${Object.keys(changes)[i]}= ? WHERE user_id = ?`,[Object.values(changes)[i],user_id],function(err)
+                            { 
+                                if(err)
+                                    {
+                                        errors.push(err)
+                                    }
+                                else
+                                    {
+                                        console.log("test", updated)
+                                        updated += 1;
+                                    }
+                            })
+                            
+                    }
+                console.log(`Updated: ${updated}:Errors ${errors.length}`)
+                if (updated+errors.length==Object.keys(changes).length-1)
+                    {
+                        if (errors.length>0)
+                            {
+                                return res.status(500).send({errors:errors})
+                            }
+                        else
+                        {
+                            return res.sendStatus(200)
+                        }
+                    } 
+            }   
+        catch(e)
+            {
+                console.log(e)
+            }
+    }})
 
 
-})
 
-
-
-router.get("/enroll",function(req,res){
-
-
-
-
-
-})
-router.put("/eroll",function(req,res){
-
-
-
-
-
-})
-
-router.delete("/eroll",function(req,res){
-
-
-
-
-
-})
+    
+//Dont use yet
+router.delete("/eroll/:userID",function(req,res)
+    {
+        try
+            {
+                const {userID} = req.params
+                const {course_id} = req.body
+                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[userID,course_id],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send(err)
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+    })
 
 
 
