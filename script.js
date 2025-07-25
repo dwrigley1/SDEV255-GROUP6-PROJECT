@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
       //window.location.href = '/index.html';
       const data = await response.json();
       console.log("Login success:", data);
-      // After successful login, replace the login page with the home page
-      window.location.replace("https://dwrigley1.github.io/SDEV255-GROUP6-PROJECT/");
+      
+      //window.location.replace("https://dwrigley1.github.io/SDEV255-GROUP6-PROJECT/");
   });
 });
