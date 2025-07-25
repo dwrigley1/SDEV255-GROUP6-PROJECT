@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!response.ok) {
         throw new Error("Login failed with status " + response.status);
       }
+       //const data = await response.json()
+      localStorage.setItem("token",response.token)
+      const token = localStorage.getItem('token');
+      console.log(token)
+      //window.location.href = './index.html';
       const data = await response.json();
       console.log("Login success:", data);
   });
