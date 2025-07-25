@@ -338,10 +338,10 @@ router.get('/login/:email/:password',function(req,res)
 router.post('/login',function(req,res)
     {
     
-        const {id,email,password,first_name,last_name,role} = req.body
+        const {email,password,first_name,last_name,role} = req.body
         // Example of how to format post request for creating user 
         // `       {
-        //             "id":"4"
+        //             
         //             "email":"fingus22@example.com",
         //             "password":"password1234",
         //             "first_name":"bill",
@@ -349,16 +349,16 @@ router.post('/login',function(req,res)
         //              "role":"teacher"
         //         }`
 
-
+        
 
 
             try
                 {
                     //insert statment
                     console.log(`${email}:${password}:${first_name},${last_name}`)
-                    const created_id = db.run("SELECT COUNT(id) From users")
-                    const insertStmt = db.prepare('INSERT INTO users (id,email,password,first_name,last_name,role) values (?,?,?,?,?,?)')
-                    insertStmt.run(created_id+1,email,password,first_name,last_name,role,function(err)
+                    //const created_id = db.run("SELECT COUNT(id) From users")
+                    const insertStmt = db.prepare('INSERT INTO users (email,password,first_name,last_name,role) values (?,?,?,?,?)')
+                    insertStmt.run(id,email,password,first_name,last_name,role,function(err)
                         { 
                             if (err)
                                 {
@@ -462,7 +462,7 @@ router.post('/courses/:userID',function(req,res)
     {
         const {userID}= req.params;
         const queryStmt = db.all('SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher')
-        const {id, name, description, subject, credits} = req.body
+        const {name, description, subject, credits} = req.body
         try
             {
                 //checks if user is a teacher
@@ -477,7 +477,7 @@ router.post('/courses/:userID',function(req,res)
                             //if teacher then creates course
                         else
                             {
-                               const insertStmt= db.prepare('INSERT INTO courses (id, name, description, subject, credits, creator_id) values (?,?,?,?,?,?)')
+                               const insertStmt= db.prepare('INSERT INTO courses ( name, description, subject, credits, creator_id) values (?,?,?,?,?)')
                                 insertStmt.run(id, name, description, subject, credits, userID,function(err)
                                 {
                                     if(err)
@@ -611,7 +611,7 @@ router.post('/cart/:user/:orderNum/',function(req,res)
                 //create cart    
                 let errors = []
                 let inserted = 0
-                const insertStmt = db.prepare(`INSERT INTO cart (id,user_id,course_id,order_num) VALUES (?,?,?,?)`)
+                const insertStmt = db.prepare(`INSERT INTO cart (user_id,course_id,order_num) VALUES (?,?,?,?)`)
                 for (const courseID of coursesID)
                     {
                 
