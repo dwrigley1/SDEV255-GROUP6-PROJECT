@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+// user needs defined first..
+
     const user = {
       first_name: document.querySelector("#fname").value,
       last_name: document.querySelector("#lname").value,
@@ -12,38 +14,26 @@ document.addEventListener("DOMContentLoaded", function () {
       role: document.querySelector("#role").value,
     };
 
-    const url = `https://sdev255-group6-project.onrender.com/api/login/${user.first_name}/${user.last_name}/${user.email}/${user.password}/${user.role}`;
-
+    // correct URL now?
     try {
-      const response = await fetch(url, {
+      const response = await fetch("https://sdev255-group6-project.onrender.com/api/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
       });
 
       if (response.ok) {
-        const data = await response.json();
         alert("Account successfully created!");
       } else {
-        const errText = await response.text();
-        console.error("Server error:", errText);
-        alert("Unsuccessful");
+        const err = await response.text(); // JSON ??
+        console.error("Backend error:", err);
+        alert("Unsuccessful :'( ");
       }
     } catch (error) {
       console.error("Network error:", error);
-      alert("If you're seeing this, something is broken :(");
+      alert("If you're seeing this something broke :( ");
     }
   });
 });
-
-
-
-/**
- * 
- * ${fname}/${lname}/${email}/${password}/${role} 
- const user = {
-      first_name: document.querySelector("#fname").value,
-      last_name: document.querySelector("#lname").value,
-      email: document.querySelector("#email").value,
-      password: document.querySelector("#password").value,
-      role: document.querySelector("#role").value,
-    };
-    **/
