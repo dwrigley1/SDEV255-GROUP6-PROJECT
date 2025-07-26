@@ -3,39 +3,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    
-    const fname = document.querySelector("#fname").value;
-    const lname = document.querySelector("#lname").value;
-    const email = document.querySelector("#email").value;
-    const password = document.querySelector("#password").value;
-    const role = document.querySelector("#role").value;
 
     const user = {
-      first_name: fname,
-      last_name: lname,
-      email: email,
-      password: password,
-      role: role,
+      first_name: document.querySelector("#fname").value,
+      last_name: document.querySelector("#lname").value,
+      email: document.querySelector("#email").value,
+      password: document.querySelector("#password").value,
+      role: document.querySelector("#role").value,
     };
-    
-      const response = await fetch(`https://sdev255-group6-project.onrender.com/api/login`, {
+
+    const url = `https://sdev255-group6-project.onrender.com/api/login/${user.first_name}/${user.last_name}/${user.email}/${user.password}/${user.role}`;
+
+    try {
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
       });
 
       if (response.ok) {
         const data = await response.json();
         alert("Account successfully created!");
       } else {
-        const err = await response.json();
-        alert("Unable to create account - " + err.message);
+        const errText = await response.text();
+        console.error("Server error:", errText);
+        alert("Unsuccessful");
       }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("If you're seeing this, something is broken :(");
     }
-  );
+  });
 });
+
 
 
 /**
