@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
       role: role,
     };
     
-      const response = await fetch(`https://sdev255-group6-project.onrender.com/api/login/`, {
+      const response = await fetch(`https://sdev255-group6-project.onrender.com/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
