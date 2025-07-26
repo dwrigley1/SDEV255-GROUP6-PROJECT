@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
       password: document.querySelector("#password").value,
       role: document.querySelector("#role").value,
     };
-      const response = await fetch("https://sdev255-group6-project.onrender.com/api/login", {
+      const response = await fetch(`https://sdev255-group6-project.onrender.com/api/login/${user_id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
