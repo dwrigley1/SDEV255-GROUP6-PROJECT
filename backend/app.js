@@ -27,8 +27,8 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URL = process.env.REDIRECT_URL;
 
-//console.log("Secret Key: "+SECRET_KEY)
-
+console.log("Secret Key: "+SECRET_KEY)
+ 
 console.log(CLIENT_ID);
 console.log(CLIENT_SECRET);
 console.log(REDIRECT_URL)
@@ -230,15 +230,21 @@ router.post("/auth/:minAuth",function(req,res)
     {
         try
             {
-                const{minAuth} = req.params.minAuth
-
+                const{minAuth} = req.params
+                //Comment out before submitting                 
+                console.log(minAuth)
+                console.log(req.body.token)
+                //
                 const bytes = CryptoJS.AES.decrypt(req.body.token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                //comment out before submitting
                 console.log("Decrypted Token:", decryptedToken);
+                //
                 const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
                 const{id,email,password,role} = (new_params)
                 if(!id || !email || !password ||!role)
                     {
+                        console.log("Missing info in token")
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
@@ -248,24 +254,26 @@ router.post("/auth/:minAuth",function(req,res)
                         {
                             if(err)
                                 {
-                                    res.send(501).send({error:err})
+                                    res.status(501).send({error:err})
+                                    return
                                 }
                             else if(row)
                                 {
                                     if(row.role!=role)
                                         {
                                             console.log(`DB role: ${row.role} != Provided Role :${role}`)
-                                            res.send(400).send({error:"Dont lie"})
+                                            res.status(400).send({error:"Dont lie"})
                                         }
                                     else if(minAuth=="teacher" && role!="teacher")
                                         {
                                             console.log(`MinAuth :${minAuth} != Role: ${role}`)
-                                            res.send(501).send({auth:false})
+                                            res.status(500).send({auth:false})
                                         }
                                     else
                                         {
+                                            console.log(console.log(`MinAuth :${minAuth} != Role: ${role}`))
                                             console.log(`${id} is approved for content`)
-                                            res.send(200).send({auth:true})
+                                            res.status(200).send({auth:true})
                                         }
                                 }
 
@@ -299,7 +307,7 @@ router.get('/login/:email/:password',function(req,res)
         
         const {email,password} = req.params
             try
-                {
+                { 
                     
                     console.log(`${email}:${password}`)
                     const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],(err,row)=>
@@ -318,7 +326,7 @@ router.get('/login/:email/:password',function(req,res)
                                     res.status(200).send({token:encryptedToken})
                                 }
                             else
-                                {
+                                { 
                                     console.log("Nothing was there")
                                     res.sendStatus(404)
                                 }    
@@ -651,7 +659,7 @@ router.get('/cart/:user_id/:orderNum',function(req,res)
         const {user_id,orderNum} = req.params
         try
             {
-                //let result = "result of parsing"//Fetch orderNum
+                
                 db.all("SELECT * FROM cart WHERE user_id = ? AND order_num = ?",[user_id,orderNum],function(err,row)
                 {
                     if(err)
@@ -661,7 +669,7 @@ router.get('/cart/:user_id/:orderNum',function(req,res)
                         }
                     else
                         {
-                            res.json(row)
+                            res.status(200).send(row)
                         }
                 })
             }
@@ -868,13 +876,20 @@ router.delete("/enroll/:userID",function(req,res)
         try
             {
                 const {userID} = req.params
+                //Make sure to send as course_id
                 const {course_id} = req.body
+                console.log(`${userID}: Course_id${course_id}`)
                 db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[userID,course_id],function(err)
                     {
                         if(err)
                             {
                                 console.log(err)
                                 res.status(500).send(err)
+                            }
+                        else
+                            {
+                                res.sendStatus(200)
+
                             }
                     })
             }
@@ -890,6 +905,6 @@ router.delete("/enroll/:userID",function(req,res)
 
 app.use("/api",router)
 
-port = 3000
+port = (process.env.PORT||3000)
 
 app.listen(port,()=>{console.log(`Server running on ${port}`)})
