@@ -6,6 +6,8 @@
   <title>Class Scheduler</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -17,7 +19,46 @@
   <h1 style="text-align: center;">Courses Offered</h1>
   <div class="course-section" id="courseSection"></div>
 
-  <!-- Teacher-only form to add a new course -->
+  <!-- Teacher form -->
+  <div id="teacherControls" style="display: none; margin: 2rem;">
+    <h2>Create New Course</h2>
+    <form id="createCourseForm">
+      <input type="text" id="courseId" placeholder="Course ID" required />
+      <input type="text" id="subject" placeholder="Subject" required />
+      <input type="number" id="creditHours" placeholder="Credit Hours" required />
+      <input type="text" id="prerequisites" placeholder="Prerequisites (optional)" />
+      <textarea id="description" placeholder="Description" required></textarea>
+      <button type="submit">Add Course</button>
+    </form>
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Group 6 Class Scheduler
+  </footer>
+</body>
+</html>
+
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Scheduler</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="topnav">
+    <a href="shoppingcart.html">Shopping Cart</a>
+    <a href="contact.html">Contact Us</a>
+  </div>
+
+  <h1 style="text-align: center;">Courses Offered</h1>
+  <div class="course-section" id="courseSection"></div>
+
+   Teacher interface for course add/edit/delete 
   <div id="teacherControls" style="display: none; margin: 2rem;">
     <h2>Create New Course</h2>
     <form id="createCourseForm">
@@ -142,7 +183,7 @@
     }
   </script>
   
-  <!-- auth token for different interfaces -->
+  < auth token for different interfaces 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
   <script src="script.js" defer></script>
 
@@ -150,3 +191,4 @@
 
 </body>
 </html>
+-->
