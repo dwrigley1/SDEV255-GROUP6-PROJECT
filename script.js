@@ -1,5 +1,4 @@
 console.log("script .js loaded") // debug statement
-
 function parseToken(token) {
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
@@ -48,7 +47,7 @@ function renderCourseCard(course, role) {
     card.appendChild(btn);
   } else if (role === "teacher") {
     const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit"; // functionality TBD
+    editBtn.textContent = "Edit";
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
