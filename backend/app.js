@@ -814,39 +814,188 @@ router.delete('/cart/:token/:orderNum',function(req,res)
 })
  
 //Enrollment
-router.post("/eroll",function(req,res){
+router.post("/enroll",function(req,res)
+// needs body params of {"user_id":"user_id_goes_here", "courseID":"courseID_goes_here"}
+    {
+        try
+            {
+                const {token,courseID} = req.body
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                if(!id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
+                db.run("INSERT into enrollment(user_id,course_id) values (?,?)",[id,courseID],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(505).send(err)
+                            }
+                        else
+                            {
+                                res.status(200).send({"Status":"Success"})
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        })
 
 
 
+router.get("/enroll",function(req,res)
+// Needs a body param of 
+//    {user_id:"user_id_goes_here"}
+    {
+        try
+            {
+                const {token} = req.body
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                console.log("ID: "+user_id)
+                if(!id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
+                db.all("SELECT * from enrollment WHERE user_id = ?",[id],function(err,row)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send(err);return
+                            } 
+                        else if(row)
+                            {
+                                res.status(200).send(row)
+                            }
+                        else
+                            {
+                                res.status(404).send("Nothing to see here")
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                req.send(err)
+            }
+
+    })
 
 
-})
+router.put("/enroll/:token",function(req,res)
+    {
+        {
+        //Any changes goes in the req.body
+        const {token} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+        const changes = req.body
+        try
+            {   let errors = []
+                let updated = 0
+                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                for (let i=0;i<=Object.keys(changes).length-1;i++)
+                    {
+                        console.log(i)
+                        db.run(`UPDATE enrollment SET ${Object.keys(changes)[i]}= ? WHERE user_id = ?`,[Object.values(changes)[i],user_id],function(err)
+                            { 
+                                if(err)
+                                    {
+                                        errors.push(err)
+                                    }
+                                else
+                                    {
+                                        console.log("test", updated)
+                                        updated += 1;
+                                    }
+                            })
+                            
+                    }
+                console.log(`Updated: ${updated}:Errors ${errors.length}`)
+                if (updated+errors.length==Object.keys(changes).length-1)
+                    {
+                        if (errors.length>0)
+                            {
+                                return res.status(500).send({errors:errors})
+                            }
+                        else
+                        {
+                            return res.sendStatus(200)
+                        }
+                    } 
+            }   
+        catch(e)
+            {
+                console.log(e)
+            }
+    }})
 
 
 
-router.get("/enroll",function(req,res){
+    
+//Dont use yet
+router.delete("/enroll/:token",function(req,res)
+    {
+        try
+            {
+                const {token} = req.params
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                //Make sure to send as course_id
+                const {course_id} = req.body
+                console.log(`${userID}: Course_id${course_id}`)
+                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[userID,course_id],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send(err)
+                            }
+                        else
+                            {
+                                res.sendStatus(200)
 
-
-
-
-
-})
-router.put("/eroll",function(req,res){
-
-
-
-
-
-})
-
-router.delete("/eroll",function(req,res){
-
-
-
-
-
-})
-
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+    })
 
 
 
