@@ -1,29 +1,36 @@
- 
-//const crypto = require('crypto');
-const token = localStorage.getItem("token");
-const user = parseToken(token);
-const role = user.role;
-const creatorId = user.id;
-function parseToken(token) {
-  console.log("parse token function triggered"); // debugging
-  const CryptoJS = ("crypto-js");
-  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
-  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
-  return obj;
-}
-
-console.log("script.js loaded"); // debug statement
+console.log("script.js loaded"); // debugging
 
 if (typeof CryptoJS === "undefined") {
   alert("CryptoJS has not loaded. Check script tags.");
-} // debug statement
+} // debugging
 
+let role = "student"; // fall back
+let creatorId = null;
+
+// moved parseToken inside window.onload
 window.onload = async function () {
   const token = localStorage.getItem("token");
-  if (!token) return window.location.href = "login.html";
-   if (role === "teacher") showTeacherUI();
-   else showStudentUI();
+
+  if (!token) {
+    console.warn("No token found — redirecting to login");
+    window.location.href = "login.html";
+    return;
+  } // safety net if there's a token issue
+
+  try {
+    const user = parseToken(token);
+    role = user.role;
+    creatorId = user.id;
+  } catch (err) {
+    console.error("Token decryption failed", err);
+    alert("Your session is invalid. Please log in again.");
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (role === "teacher") showTeacherUI();
+  else showStudentUI();
 
   const courseSection = document.getElementById("courseSection");
   const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/0");
@@ -57,6 +64,14 @@ window.onload = async function () {
     });
   }
 };
+
+function parseToken(token) {
+  console.log("parse token function triggered");
+  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
+  return obj;
+}
 
 function addToCart(courseName) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
