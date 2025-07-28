@@ -1,9 +1,12 @@
+ 
+//const crypto = require('crypto');
 const token = localStorage.getItem("token");
 const user = parseToken(token);
 const role = user.role;
 const creatorId = user.id;
 function parseToken(token) {
   console.log("parse token function triggered"); // debugging
+  const CryptoJS = require("crypto-js");
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
@@ -19,13 +22,8 @@ if (typeof CryptoJS === "undefined") {
 window.onload = async function () {
   const token = localStorage.getItem("token");
   if (!token) return window.location.href = "login.html";
-
-  
-  const role = user.role;
-  const creatorId = user.id;
-
-  if (role === "teacher") showTeacherUI();
-  else showStudentUI();
+   if (role === "teacher") showTeacherUI();
+   else showStudentUI();
 
   const courseSection = document.getElementById("courseSection");
   const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/0");
@@ -59,8 +57,6 @@ window.onload = async function () {
     });
   }
 };
-
-
 
 function addToCart(courseName) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
