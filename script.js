@@ -1,3 +1,14 @@
+const user = parseToken(token);
+const role = user.role;
+const creatorId = user.id;
+function parseToken(token) {
+  console.log("parse token function triggered"); // debugging
+  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
+  return obj;
+}
+
 console.log("script.js loaded"); // debug statement
 
 if (typeof CryptoJS === "undefined") {
@@ -8,7 +19,7 @@ window.onload = async function () {
   const token = localStorage.getItem("token");
   if (!token) return window.location.href = "login.html";
 
-  const user = parseToken(token);
+  
   const role = user.role;
   const creatorId = user.id;
 
@@ -48,13 +59,7 @@ window.onload = async function () {
   }
 };
 
-function parseToken(token) {
-  console.log("parse token function triggered"); // debugging
-  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
-  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
-  return obj;
-}
+
 
 function addToCart(courseName) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
