@@ -6,13 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // user needs defined first..
 
-    const user = {
-      first_name: document.querySelector("#fname").value,
-      last_name: document.querySelector("#lname").value,
-      email: document.querySelector("#email").value,
-      password: document.querySelector("#password").value,
-      role: document.querySelector("#role").value,
-    };
+   const user = {
+    id: Date.now().toString(), // 
+    first_name: document.querySelector("#fname").value,
+    last_name: document.querySelector("#lname").value,
+    email: document.querySelector("#email").value,
+    password: document.querySelector("#password").value,
+    role: document.querySelector("#role").value,
+  };
+
 
     // correct URL now?
     try {
@@ -26,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         alert("Account successfully created!");
+        window.location.href = "login.html";
       } else {
         const err = await response.text(); // JSON ??
         console.error("Backend error:", err);

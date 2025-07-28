@@ -1,6 +1,7 @@
 console.log("script .js loaded") // debug statement
+
 function parseToken(token) {
-  console.log("parse token function triggered")
+  console.log("parse token function triggered") // debugging
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
