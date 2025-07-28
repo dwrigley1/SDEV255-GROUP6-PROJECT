@@ -27,8 +27,8 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URL = process.env.REDIRECT_URL;
 
-//console.log("Secret Key: "+SECRET_KEY)
-
+console.log("Secret Key: "+SECRET_KEY)
+ 
 console.log(CLIENT_ID);
 console.log(CLIENT_SECRET);
 console.log(REDIRECT_URL)
@@ -230,15 +230,23 @@ router.post("/auth/:minAuth",function(req,res)
     {
         try
             {
-                const{minAuth} = req.params.minAuth
-
+                const{minAuth} = req.params
+                //Comment out before submitting                 
+                console.log(minAuth)
+                console.log(req.body.token)
+                
+                //console.log(`Decrypto Test: ${decrypto(req.body.token).map(item=>console.log(item))} `)
+                //
                 const bytes = CryptoJS.AES.decrypt(req.body.token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                //comment out before submitting
                 console.log("Decrypted Token:", decryptedToken);
+                //
                 const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
                 const{id,email,password,role} = (new_params)
                 if(!id || !email || !password ||!role)
                     {
+                        console.log("Missing info in token")
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
@@ -248,24 +256,26 @@ router.post("/auth/:minAuth",function(req,res)
                         {
                             if(err)
                                 {
-                                    res.send(501).send({error:err})
+                                    res.status(501).send({error:err})
+                                    return
                                 }
                             else if(row)
                                 {
                                     if(row.role!=role)
                                         {
                                             console.log(`DB role: ${row.role} != Provided Role :${role}`)
-                                            res.send(400).send({error:"Dont lie"})
+                                            res.status(400).send({error:"Dont lie"})
                                         }
                                     else if(minAuth=="teacher" && role!="teacher")
                                         {
                                             console.log(`MinAuth :${minAuth} != Role: ${role}`)
-                                            res.send(501).send({auth:false})
+                                            res.status(500).send({auth:false})
                                         }
                                     else
                                         {
+                                            console.log(console.log(`MinAuth :${minAuth} != Role: ${role}`))
                                             console.log(`${id} is approved for content`)
-                                            res.send(200).send({auth:true})
+                                            res.status(200).send({auth:true})
                                         }
                                 }
 
@@ -299,7 +309,7 @@ router.get('/login/:email/:password',function(req,res)
         
         const {email,password} = req.params
             try
-                {
+                { 
                     
                     console.log(`${email}:${password}`)
                     const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],(err,row)=>
@@ -318,7 +328,7 @@ router.get('/login/:email/:password',function(req,res)
                                     res.status(200).send({token:encryptedToken})
                                 }
                             else
-                                {
+                                { 
                                     console.log("Nothing was there")
                                     res.sendStatus(404)
                                 }    
@@ -381,14 +391,25 @@ router.post('/login',function(req,res)
                 }
     });
 
-router.put('/login/:email/',function(req,res)
+router.put('/login/:token/',function(req,res)
     {
-        const {email}= req.params
+        const {token}= req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         const changes = req.body
         // struture for puts are {column:value}
        console.log(changes)
         try
-            {   let errors = []
+            {   
+                let errors = []
                 let updated = 0
                 //console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
                 for (let i=0;i<=Object.keys(changes).length-1;i++)
@@ -418,12 +439,22 @@ router.put('/login/:email/',function(req,res)
             }
     })
 
-router.delete('/login/:ID',function(req,res)
+router.delete('/login/:token',function(req,res)
     {
-        const {ID} = req.params
+        const {token} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         try
             {
-                db.run(`DELETE FROM users WHERE ID =?`,[ID],function(err)
+                db.run(`DELETE FROM users WHERE ID =?`,[id],function(err)
                     {
                         if(err)
                             {
@@ -447,9 +478,19 @@ router.delete('/login/:ID',function(req,res)
 
 //courses
 
-router.post('/courses/:userID',function(req,res)
+router.post('/courses/:token',function(req,res)
     {
-        const {userID}= req.params;
+        const {token}= req.params;
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
         if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
@@ -457,7 +498,7 @@ router.post('/courses/:userID',function(req,res)
             {
 
                 //checks if user is a teacher
-                db.run(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = "teacher" `,userID,function(err)
+                db.run(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = "teacher" `,id,function(err)
                     {
                         //if not teacher
                         if(err)
@@ -469,7 +510,7 @@ router.post('/courses/:userID',function(req,res)
                         else
                             {
                                const insertStmt= db.prepare('INSERT INTO courses ( name, description, subject, credits, creator_id) values (?,?,?,?,?)')
-                                insertStmt.run( name, description, subject, credits, userID,function(err)
+                                insertStmt.run( name, description, subject, credits, id,function(err)
                                 {
                                     if(err)
                                         {
@@ -491,9 +532,19 @@ router.post('/courses/:userID',function(req,res)
     })
 
 
-router.get('/courses/:userID',function(req,res)
+router.get('/courses/:token',function(req,res)
     {
-        const {userID}= req.params;
+        const {token}= req.params;
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         try
             { 
                 //login function checking db
@@ -523,11 +574,21 @@ router.get('/courses/:userID',function(req,res)
 
 
 
-router.put('/courses/:coursesID/:userID',function(req,res)
+router.put('/courses/:coursesID/:token',function(req,res)
     {
         
         //coursesID put in the url 
-        const {userID,coursesID} = req.params
+        const {token,coursesID} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         
         //what will be changed goes here
         //assuming structure will be {column:value}
@@ -538,7 +599,7 @@ router.put('/courses/:coursesID/:userID',function(req,res)
             {
                 //update courses
                 console.log(`Value: ${Object.values(courseChanges)[0]} \n ${coursesID}`)
-                db.run(`UPDATE courses SET ${Object.keys(courseChanges)} = ? WHERE id = ? and creator_id = ?`,[Object.values(courseChanges)[0],coursesID,userID],function(err)
+                db.run(`UPDATE courses SET ${Object.keys(courseChanges)} = ? WHERE id = ? and creator_id = ?`,[Object.values(courseChanges)[0],coursesID,id],function(err)
                     {
                         if (err)
                             {
@@ -591,10 +652,20 @@ router.put('/courses/:coursesID/:userID',function(req,res)
 
 
 //cart
-router.post('/cart/:user/:orderNum/',function(req,res)
+router.post('/cart/:token/:orderNum/',function(req,res)
     {
-        const {user,orderNum}= req.params
-        //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
+        const {token,orderNum}= req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+        //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]} in the body        
         const {coursesID} = req.body
         
         try
@@ -610,7 +681,7 @@ router.post('/cart/:user/:orderNum/',function(req,res)
                         //console.log(`coursesID ${coursesID.length}`)
                         console.log(`coursesID elements :${courseID}`)
                     
-                        insertStmt.run([orderNum,user,courseID,orderNum],function(err)
+                        insertStmt.run([orderNum,id,courseID,orderNum],function(err)
                             {
                                 if (err)
                                     {
@@ -646,12 +717,22 @@ router.post('/cart/:user/:orderNum/',function(req,res)
     })
 
 
-router.get('/cart/:user_id/:orderNum',function(req,res)
+router.get('/cart/:token/:orderNum',function(req,res)
     {
-        const {user_id,orderNum} = req.params
+        const {token,orderNum} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         try
             {
-                //let result = "result of parsing"//Fetch orderNum
+                
                 db.all("SELECT * FROM cart WHERE user_id = ? AND order_num = ?",[user_id,orderNum],function(err,row)
                 {
                     if(err)
@@ -661,7 +742,7 @@ router.get('/cart/:user_id/:orderNum',function(req,res)
                         }
                     else
                         {
-                            res.json(row)
+                            res.status(200).send(row)
                         }
                 })
             }
@@ -673,9 +754,20 @@ router.get('/cart/:user_id/:orderNum',function(req,res)
     })
 
 
-router.put('/cart/:user_id/:orderNum',function(req,res)
+router.put('/cart/:token/:orderNum',function(req,res)
     {
-        const {user_id,orderNum} = req.params
+        //Any changes goes in the req.body
+        const {token,orderNum} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         const changes = req.body
       
 
@@ -686,7 +778,7 @@ router.put('/cart/:user_id/:orderNum',function(req,res)
                 for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
                         console.log(i)
-                        db.run(`UPDATE cart SET ${Object.keys(changes)[i]}= ? WHERE user_id = ? and order_num= ?`,[Object.values(changes)[i],user_id,orderNum],function(err)
+                        db.run(`UPDATE cart SET ${Object.keys(changes)[i]}= ? WHERE user_id = ? and order_num= ?`,[Object.values(changes)[i],id,orderNum],function(err)
                             { 
                                 if(err)
                                     {
@@ -721,12 +813,22 @@ router.put('/cart/:user_id/:orderNum',function(req,res)
     })
 
 
-router.delete('/cart/:user/:orderNum',function(req,res)
+router.delete('/cart/:token/:orderNum',function(req,res)
     {
-        const {user,orderNum} = req.params
+        const {token,orderNum} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         try
             {
-                db.run('DELETE FROM cart WHERE user_id = ? AND order_num= ?',[user,orderNum],function(err)
+                db.run('DELETE FROM cart WHERE user_id = ? AND order_num= ?',[id,orderNum],function(err)
                     {
                         if(err)
                             {
@@ -746,46 +848,197 @@ router.delete('/cart/:user/:orderNum',function(req,res)
             res.sendStatus(403)
         }
 })
-
+ 
 //Enrollment
-router.post("/eroll",function(req,res){
+router.post("/enroll",function(req,res)
+// needs body params of {"user_id":"user_id_goes_here", "courseID":"courseID_goes_here"}
+    {
+        try
+            {
+                const {token,courseID} = req.body
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                if(!id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
+                db.run("INSERT into enrollment(user_id,course_id) values (?,?)",[id,courseID],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(505).send(err)
+                            }
+                        else
+                            {
+                                res.status(200).send({"Status":"Success"})
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        })
 
 
 
+router.get("/enroll",function(req,res)
+// Needs a body param of 
+//    {user_id:"user_id_goes_here"}
+    {
+        try
+            {
+                const {token} = req.body
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                console.log("ID: "+user_id)
+                if(!id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
+                db.all("SELECT * from enrollment WHERE user_id = ?",[id],function(err,row)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send(err);return
+                            } 
+                        else if(row)
+                            {
+                                res.status(200).send(row)
+                            }
+                        else
+                            {
+                                res.status(404).send("Nothing to see here")
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                req.send(err)
+            }
+
+    })
 
 
-})
+router.put("/enroll/:token",function(req,res)
+    {
+        {
+        //Any changes goes in the req.body
+        const {token} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+        const changes = req.body
+        try
+            {   let errors = []
+                let updated = 0
+                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                for (let i=0;i<=Object.keys(changes).length-1;i++)
+                    {
+                        console.log(i)
+                        db.run(`UPDATE enrollment SET ${Object.keys(changes)[i]}= ? WHERE user_id = ?`,[Object.values(changes)[i],user_id],function(err)
+                            { 
+                                if(err)
+                                    {
+                                        errors.push(err)
+                                    }
+                                else
+                                    {
+                                        console.log("test", updated)
+                                        updated += 1;
+                                    }
+                            })
+                            
+                    }
+                console.log(`Updated: ${updated}:Errors ${errors.length}`)
+                if (updated+errors.length==Object.keys(changes).length-1)
+                    {
+                        if (errors.length>0)
+                            {
+                                return res.status(500).send({errors:errors})
+                            }
+                        else
+                        {
+                            return res.sendStatus(200)
+                        }
+                    } 
+            }   
+        catch(e)
+            {
+                console.log(e)
+            }
+    }})
 
 
 
-router.get("/enroll",function(req,res){
+    
+//Dont use yet
+router.delete("/enroll/:token",function(req,res)
+    {
+        try
+            {
+                const {token} = req.params
+                const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
+                //Make sure to send as course_id
+                const {course_id} = req.body
+                console.log(`${userID}: Course_id${course_id}`)
+                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[userID,course_id],function(err)
+                    {
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send(err)
+                            }
+                        else
+                            {
+                                res.sendStatus(200)
 
+                            }
+                    })
+            }
+        catch(err)
+            {
+                console.log(err)
+                res.status(500).send(err)
+            }
+    })
 
-
-
-
-})
-router.put("/eroll",function(req,res){
-
-
-
-
-
-})
-
-router.delete("/eroll",function(req,res){
-
-
-
-
-
-})
 
 
 
 
 app.use("/api",router)
 
-port = 3000
+port = (process.env.PORT||3000)
 
 app.listen(port,()=>{console.log(`Server running on ${port}`)})
