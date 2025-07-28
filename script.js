@@ -1,13 +1,12 @@
-console.log("script.js loaded"); // debugging
+console.log("script.js loaded");
 
 if (typeof CryptoJS === "undefined") {
   alert("CryptoJS has not loaded. Check script tags.");
-} // debugging
+}
 
-let role = "student"; // fall back
+let role = "student"; // default fallback
 let creatorId = null;
 
-// moved parseToken inside window.onload
 window.onload = async function () {
   const token = localStorage.getItem("token");
 
@@ -15,7 +14,7 @@ window.onload = async function () {
     console.warn("No token found — redirecting to login");
     window.location.href = "login.html";
     return;
-  } // safety net if there's a token issue
+  }
 
   try {
     const user = parseToken(token);
@@ -25,7 +24,9 @@ window.onload = async function () {
     console.error("Token decryption failed", err);
     alert("Your session is invalid. Please log in again.");
     localStorage.removeItem("token");
-    window.location.href = "login.html";
+    if (!window.location.href.includes("login.html")) {
+      window.location.href = "login.html";
+    }
     return;
   }
 
@@ -54,7 +55,7 @@ window.onload = async function () {
         description: document.getElementById("description").value,
       };
 
-      await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${creatorId}`, {
+      await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(course),
@@ -128,8 +129,9 @@ function renderCourseCard(course, role) {
 }
 
 async function deleteCourse(courseId) {
+  const token = localStorage.getItem("token");
   if (!confirm("Are you sure you want to delete this course?")) return;
-  await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
+  await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}/${courseId}`, {
     method: "DELETE"
   });
   location.reload();
