@@ -1,8 +1,8 @@
 console.log("script.js loaded");
 
-if (typeof CryptoJS === "undefined") {
-  alert("CryptoJS has not loaded. Check script tags.");
-}
+//if (typeof CryptoJS === "undefined") {
+  //alert("CryptoJS has not loaded. Check script tags.");
+//}
 
 let role = "student"; // default fallback
 let creatorId = null;
