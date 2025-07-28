@@ -1,3 +1,4 @@
+const token = localStorage.getItem("token");
 const user = parseToken(token);
 const role = user.role;
 const creatorId = user.id;
