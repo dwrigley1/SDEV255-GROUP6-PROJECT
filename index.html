@@ -6,8 +6,6 @@
   <title>Class Scheduler</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="script.js"></script>
 </head>
 
 <body>
@@ -136,7 +134,7 @@
     }
 
     async function deleteCourse(courseId) {
-      if (!confirm("Are you sure you want to delete this course?")) return;
+      if (!confirm("Delete Course?")) return;
       await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
         method: "DELETE"
       });
@@ -144,6 +142,10 @@
     }
   </script>
   
+  <!-- auth token for different interfaces -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
+  <script src="script.js" defer></script>
+
 </body>
 
 </body>

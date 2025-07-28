@@ -1,4 +1,8 @@
 console.log("script .js loaded") // debug statement
+if (typeof CryptoJS === "undefined") {
+  alert("CryptoJS is not loaded. Check your script tags.");
+} // debug statement, keep getting a CryptoJS error
+
 
 function parseToken(token) {
   console.log("parse token function triggered") // debugging
