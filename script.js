@@ -1,21 +1,8 @@
-console.log("script.js loaded");
-
-
 let role = "student"; // default fallback
 let creatorId = null;
 
 window.onload = async function () {
   const token = localStorage.getItem("token");
-
-  /** 
-  if (!token) {
-    console.warn("No token , back to the login screen.");
-    window.location.href = "login.html";
-    return;
-  }
-    
-  commented out due to creating infinite loop
-  **/
 
   try {
     const user = parseToken(token);
