@@ -1,8 +1,5 @@
 console.log("script.js loaded");
 
-//if (typeof CryptoJS === "undefined") {
-  //alert("CryptoJS has not loaded. Check script tags.");
-//}
 
 let role = "student"; // default fallback
 let creatorId = null;
@@ -10,11 +7,15 @@ let creatorId = null;
 window.onload = async function () {
   const token = localStorage.getItem("token");
 
+  /** 
   if (!token) {
-    console.warn("No token found — redirecting to login");
+    console.warn("No token , back to the login screen.");
     window.location.href = "login.html";
     return;
   }
+    
+  commented out due to creating infinite loop
+  **/
 
   try {
     const user = parseToken(token);
@@ -22,7 +23,7 @@ window.onload = async function () {
     creatorId = user.id;
   } catch (err) {
     console.error("Token decryption failed", err);
-    alert("Your session is invalid. Please log in again.");
+    alert("token issue");
     localStorage.removeItem("token");
     if (!window.location.href.includes("login.html")) {
       window.location.href = "login.html";
@@ -67,7 +68,7 @@ window.onload = async function () {
 };
 
 function parseToken(token) {
-  console.log("parse token function triggered");
+  console.log("parse token function triggered"); // debugging
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
@@ -83,11 +84,11 @@ function addToCart(courseName) {
 
 function showTeacherUI() {
   document.getElementById("teacherControls").style.display = "block";
-}
+} // teacher interface
 
 function showStudentUI() {
   document.getElementById("teacherControls").style.display = "none";
-}
+} // student interface
 
 function renderCourseCard(course, role) {
   const card = document.createElement("div");
@@ -130,7 +131,7 @@ function renderCourseCard(course, role) {
 
 async function deleteCourse(courseId) {
   const token = localStorage.getItem("token");
-  if (!confirm("Are you sure you want to delete this course?")) return;
+  if (!confirm(" Delete Course?")) return;
   await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}/${courseId}`, {
     method: "DELETE"
   });
