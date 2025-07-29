@@ -27,10 +27,10 @@ async function addCourse(){
     if(response.ok){
         const results = await response.json()
         alert("Added course" + results._id)
-        document.querySelector("form").reset()
+        document.querySelector("form").reset() // reset the form after adding a course
     }
     else{
-        document.querySelector("#error").innerHTML = "Cannot add course"
+        document.querySelector("#error").innerHTML = "Cannot add course" // alerts the user of an error
     }
 }
 
@@ -53,10 +53,10 @@ async function deleteCourse(){
     if(response.ok){
         const results = await response.json()
         alert("Deleted course" + results._id)
-        document.querySelector("form").reset()
+        document.querySelector("form").reset() // resets form after deletion
     }
     else{
-        document.querySelector("#error").innerHTML = "Cannot delete course"
+        document.querySelector("#error").innerHTML = "Cannot delete course" // error alert to user
     }
 }
 

@@ -10,15 +10,13 @@
 <body>
   <div class="topnav">
     <a href="contact.html">Contact Us</a>
-    <a href="index.html">Return Home</a>
+    <!-- <a href="index.html">Return Home</a> --> <!-- unsure what to do here, yet -->
   </div>
 
   <div class="main">
     <h1>Shopping Cart</h1>
     <ul id="cart-list"></ul>
-
     <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
-
   </div>
 
   <script>
@@ -35,8 +33,6 @@
         cart.forEach((course, index) => {
           const li = document.createElement('li');
           li.textContent = course + ' ';
-
-          
 
           const removeBtn = document.createElement('button');
           removeBtn.classList.add('remove-btn');
