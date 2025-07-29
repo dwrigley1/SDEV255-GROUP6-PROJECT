@@ -320,7 +320,7 @@ router.get('/login/:email/:password',function(req,res)
                                     console.log(`${JSON.stringify(row)} was found`)
                                     const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
                                     const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
-                                    res.status(200).send({token:encryptedToken})
+                                    res.status(200).send({token:encryptedToken,role:row.role})
                                 }
                             else
                                 { 
