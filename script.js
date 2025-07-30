@@ -41,9 +41,9 @@ window.onload = async function () {
         e.preventDefault();
 
         const course = {
-          name: document.getElementById("courseId").value,
+          name: document.getElementById("name").value,
           subject: document.getElementById("subject").value,
-          credits: document.getElementById("creditHours").value,
+          credits: document.getElementById("credits").value,
           description: document.getElementById("description").value,
         };
 

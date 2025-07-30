@@ -22,14 +22,18 @@
    <div id="teacherControls" style="display: none; margin: 2rem;">
     <h2>Create New Course</h2>
     <form id="createCourseForm">
-      <input type="text" id="courseId" placeholder="Course ID" required />
+      <input type="text" id="name" placeholder="Course Name" required />
       <input type="text" id="subject" placeholder="Subject" required />
-      <input type="number" id="creditHours" placeholder="Credit Hours" required />
-      <input type="text" id="prerequisites" placeholder="Prerequisites (optional)" />
+      <input type="number" id="credits" placeholder="Credit Hours" required />
       <textarea id="description" placeholder="Description" required></textarea>
       <button type="submit">Add Course</button>
     </form>
   </div>
+
+  <!-- backend logic -------------- are these positional arguments?
+   const {name, description, subject, credits} = req.body
+        if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
+        -->
 
   <footer class="footer">
     &copy; 2025 Group 6 Class Scheduler
