@@ -386,9 +386,9 @@ router.post('/login',function(req,res)
                 }
     });
 
-router.put('/login/:token/',function(req,res)
+router.put('/login',function(req,res)
     {
-        const {token}= req.params
+        const {token}= req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -434,9 +434,9 @@ router.put('/login/:token/',function(req,res)
             }
     })
 
-router.delete('/login/:token',function(req,res)
+router.delete('/login',function(req,res)
     {
-        const {token} = req.params
+        const {token} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -473,19 +473,22 @@ router.delete('/login/:token',function(req,res)
 
 //courses
 
-router.post('/courses/:token',function(req,res)
+router.post('/courses',function(req,res)
     {
-        const {token}= req.params;
+        const {token}= req.body;
+        console.log(token)
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
                 const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
                 const{id,email,password,role} = (new_params)
+                
                 if(!id || !email || !password ||!role)
                     {
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
+        console.log(id,email)
         //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
         if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
@@ -527,9 +530,9 @@ router.post('/courses/:token',function(req,res)
     })
 
 
-router.get('/courses/:token',function(req,res)
+router.get('/courses',function(req,res)
     {
-        const {token}= req.params;
+        const {token}= req.body;
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -569,11 +572,12 @@ router.get('/courses/:token',function(req,res)
 
 
 
-router.put('/courses/:coursesID/:token',function(req,res)
+router.put('/courses/:coursesID',function(req,res)
     {
         
         //coursesID put in the url 
-        const {token,coursesID} = req.params
+        const {coursesID} = req.params
+        const {token} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -647,11 +651,21 @@ router.put('/courses/:coursesID/:token',function(req,res)
 
 
 //cart
-router.post('/cart/:token/:orderNum/',function(req,res)
+router.post('/cart/:orderNum',function(req,res)
     {
-        const {user,orderNum}= req.params
+        const {orderNum}= req.params
         //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
-        const {coursesID} = req.body
+        const {token,coursesID} = req.body
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         
         try
             { 
@@ -702,9 +716,19 @@ router.post('/cart/:token/:orderNum/',function(req,res)
     })
 
 
-router.get('/cart/:token/:orderNum',function(req,res)
+router.get('/cart/:orderNum',function(req,res)
     {
-        const {user_id,orderNum} = req.params
+        const {orderNum} = req.params
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
         try
             {
                 //let result = "result of parsing"//Fetch orderNum
@@ -729,10 +753,20 @@ router.get('/cart/:token/:orderNum',function(req,res)
     })
 
 
-router.put('/cart/:token/:orderNum',function(req,res)
+router.put('/cart/:orderNum',function(req,res)
     {
-        const {user_id,orderNum} = req.params
-        const changes = req.body
+        const {orderNum} = req.params
+        const {token,changes} = req.body
+        const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
+                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                console.log("Decrypted Token:", decryptedToken);
+                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                const{id,email,password,role} = (new_params)
+                if(!id || !email || !password ||!role)
+                    {
+                        res.status(503).send({error:"Missing id/email/password/role"})
+                        return
+                    }
       
 
         try
@@ -777,9 +811,10 @@ router.put('/cart/:token/:orderNum',function(req,res)
     })
 
 
-router.delete('/cart/:token/:orderNum',function(req,res)
+router.delete('/cart/:orderNum',function(req,res)
     {
-        const {token,orderNum} = req.params
+        const {orderNum} = req.params
+        const {token} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -870,7 +905,7 @@ router.get("/enroll",function(req,res)
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
-                console.log("ID: "+user_id)
+                console.log("ID: "+id)
                 if(!id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
                 db.all("SELECT * from enrollment WHERE user_id = ?",[id],function(err,row)
                     {
@@ -898,11 +933,11 @@ router.get("/enroll",function(req,res)
     })
 
 
-router.put("/enroll/:token",function(req,res)
+router.put("/enroll",function(req,res)
     {
         {
         //Any changes goes in the req.body
-        const {token} = req.params
+        const {token,changes} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -913,7 +948,7 @@ router.put("/enroll/:token",function(req,res)
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
-        const changes = req.body
+        
         try
             {   let errors = []
                 let updated = 0
@@ -958,11 +993,11 @@ router.put("/enroll/:token",function(req,res)
 
     
 //Dont use yet
-router.delete("/enroll/:token",function(req,res)
+router.delete("/enroll",function(req,res)
     {
         try
             {
-                const {token} = req.params
+                const {token,course_id} = req.body
                 const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -974,9 +1009,9 @@ router.delete("/enroll/:token",function(req,res)
                         return
                     }
                 //Make sure to send as course_id
-                const {course_id} = req.body
-                console.log(`${userID}: Course_id${course_id}`)
-                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[userID,course_id],function(err)
+
+                console.log(`${id}: Course_id${course_id}`)
+                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[id,course_id],function(err)
                     {
                         if(err)
                             {
