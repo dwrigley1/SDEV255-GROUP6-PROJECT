@@ -45,11 +45,11 @@ window.onload = async function () {
           subject: document.getElementById("subject").value,
           credits: document.getElementById("credits").value,
           description: document.getElementById("description").value,
-          token:token
+          token:token.toString()
         };
-
+        console.log(course)
         try { 
-          const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
+            const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(course),
