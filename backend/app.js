@@ -260,17 +260,20 @@ router.post("/auth/:minAuth",function(req,res)
                                         {
                                             console.log(`DB role: ${row.role} != Provided Role :${role}`)
                                             res.status(400).send({error:"Dont lie"})
+                                            return
                                         }
                                     else if(minAuth=="teacher" && role!="teacher")
                                         {
                                             console.log(`MinAuth :${minAuth} != Role: ${role}`)
                                             res.status(500).send({auth:false})
+                                            return
                                         }
                                     else
                                         {
                                             console.log(console.log(`MinAuth :${minAuth} != Role: ${role}`))
                                             console.log(`${id} is approved for content`)
                                             res.status(200).send({auth:true})
+                                            return
                                         }
                                 }
 
@@ -314,6 +317,7 @@ router.get('/login/:email/:password',function(req,res)
                                 {
                                     console.log(`Oh man there was an error :${err}`)
                                     res.status(500).send({error:err})
+                                    return
                                 }
                             else if (row)
                                 {
@@ -321,11 +325,13 @@ router.get('/login/:email/:password',function(req,res)
                                     const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
                                     const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
                                     res.status(200).send({token:encryptedToken,role:row.role})
+                                    return
                                 }
                             else
                                 { 
                                     console.log("Nothing was there")
                                     res.sendStatus(404)
+                                    return
                                 }    
                     })
             }
@@ -369,11 +375,13 @@ router.post('/login',function(req,res)
                                 {
                                     console.error("Error inserting change:",err)
                                     res.status(500).send({error:err})
+                                    return
                                 }
                             else 
                                 {
                                     console.log("Success!")
                                     res.sendStatus(200);
+                                    return
                                 };
                             //frees up reasources and commits
                             insertStmt.finalize();
@@ -383,6 +391,7 @@ router.post('/login',function(req,res)
                 {
                     console.log(e)
                     res.sendStatus(404)
+                    return
                 }
     });
 
@@ -414,8 +423,9 @@ router.put('/login',function(req,res)
                             { 
                                 if(err)
                                     {
-                                        console.log(err)
-                                        res.status(500).send(err)
+                                        console.log(err);
+                                        res.status(500).send(err);
+                                        return;
                                     }
                                 else
                                     {
@@ -426,6 +436,7 @@ router.put('/login',function(req,res)
                     }
                 console.log(`If it existed it changed`)
                 res.sendStatus(200)
+                return
 
             }   
         catch(e)
@@ -455,10 +466,12 @@ router.delete('/login',function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send({error:err})
+                                return;
                             }
                         else
                             {
                                 res.sendStatus(200)
+                                return
                             }    
                     })
             }
@@ -555,10 +568,12 @@ router.get('/courses',function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send({error:err})
+                                return
                             }
                         else if (row)
                             {
                                 res.status(200).send(row)
+                                return
                             }
                         else
                             {
@@ -570,6 +585,7 @@ router.get('/courses',function(req,res)
             {
                 console.log(e)
                 res.sendStatus(404)
+                return;
             }
     });
 
@@ -607,12 +623,14 @@ router.put('/courses/:coursesID',function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send({error:err})
+                                return
                             }
                         else
                             {
                         
                                 console.log(courseChanges)
                                 res.send(200)
+                                return
                             }
                     })
             }
@@ -620,6 +638,7 @@ router.put('/courses/:coursesID',function(req,res)
             {
                 console.log(e)
                 res.send(403)
+                return
             }
     })
 
@@ -634,10 +653,12 @@ router.put('/courses/:coursesID',function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send({error:err})
+                                return
                             }
                         else
                             {
                                 res.send(200)
+                                return
                             }
                     })
 
@@ -745,6 +766,7 @@ router.get('/cart/:orderNum',function(req,res)
                     else
                         {
                             res.status(200).send(row)
+                            return
                         }
                 })
             }
@@ -752,6 +774,7 @@ router.get('/cart/:orderNum',function(req,res)
             {
                 console.log(e)
                 res.sendStatus(404)
+                return
             }
     })
 
@@ -837,10 +860,12 @@ router.delete('/cart/:orderNum',function(req,res)
                                 console.log(err)
                                 //sends a json of the issue and a 500 status
                                 res.status(500).send({error:err})
+                                return
                             }
                         else
                             {
                                 res.send(200)
+                                return
                             }
                     })
             }
@@ -848,6 +873,7 @@ router.delete('/cart/:orderNum',function(req,res)
         {
             console.log(e)
             res.sendStatus(403)
+            return
         }
 })
  
@@ -875,10 +901,12 @@ router.post("/enroll",function(req,res)
                             {
                                 console.log(err)
                                 res.status(505).send(err)
+                                return
                             }
                         else
                             {
                                 res.status(200).send({"Status":"Success"})
+                                return
                             }
                     })
             }
@@ -886,6 +914,7 @@ router.post("/enroll",function(req,res)
             {
                 console.log(err)
                 res.status(500).send(err)
+                return
             }
         })
 
@@ -920,17 +949,20 @@ router.get("/enroll",function(req,res)
                         else if(row)
                             {
                                 res.status(200).send(row)
+                                return
                             }
                         else
                             {
                                 res.status(404).send("Nothing to see here")
+                                return
                             }
                     })
             }
         catch(err)
             {
                 console.log(err)
-                req.send(err)
+                res.send(err)
+                return
             }
 
     })
@@ -1020,10 +1052,12 @@ router.delete("/enroll",function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send(err)
+                                return
                             }
                         else
                             {
                                 res.sendStatus(200)
+                                return
 
                             }
                     })
@@ -1032,6 +1066,7 @@ router.delete("/enroll",function(req,res)
             {
                 console.log(err)
                 res.status(500).send(err)
+                return
             }
     })
 
