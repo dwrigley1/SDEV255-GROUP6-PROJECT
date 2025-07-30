@@ -491,7 +491,7 @@ router.post('/courses',function(req,res)
         console.log(id,email)
         //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
-        if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
+        if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"});return;}
         try
             {
 
@@ -503,6 +503,7 @@ router.post('/courses',function(req,res)
                             {
                                 console.log(err)
                                 res.status(500).send({error:err})
+                                return;
                             }
                             //if teacher then creates course
                         else
@@ -514,10 +515,12 @@ router.post('/courses',function(req,res)
                                         {
                                             console.log(err)
                                             res.status(500).send({error:err})
+                                            return;
                                         }
                                     else
                                         {
-                                            res.sendStatus(200)
+                                            res.status(200).send({"Pass":"Yea"})
+                                            return;
                                         }
                                 })
                             }    
