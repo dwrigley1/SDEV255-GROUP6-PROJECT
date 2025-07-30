@@ -42,7 +42,8 @@ const corsOptions = {
     'http://localhost:3000',
     'https://dwrigley1.github.io/SDEV255-GROUP6-PROJECT',
     'https://dwrigley1.github.io',
-    'https://sdev255-group6-project.onrender.com'
+    'https://sdev255-group6-project.onrender.com',
+    'http://localhost:5500'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -546,9 +547,52 @@ router.post('/courses',function(req,res)
     })
 
 
-router.get('/courses',function(req,res)
+router.get('/courses/',function(req,res)
+    {
+        
+        try
+            { 
+                //login function checking db
+                db.all('SELECT id, name , description,subject,credits FROM courses',function(err,row)
+                    { 
+                        if(err)
+                            {
+                                console.log(err)
+                                res.status(500).send({error:err})
+                                return
+                            }
+                        else if (row)
+                            {
+                                console.log("Sending all course rows now")
+                                res.status(200).send(row)
+                                return
+                            }
+                        else
+                            {
+                                console.log("Nothing to seee here")
+                            }
+                    })
+            }
+        catch(e)
+            {
+                console.log(e)
+                res.sendStatus(404)
+                return;
+            }
+    });
+
+
+
+
+
+
+
+
+
+router.post('/coursesList/',function(req,res)
     {
         const {token}= req.body;
+        console.log(token)
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -562,7 +606,7 @@ router.get('/courses',function(req,res)
         try
             { 
                 //login function checking db
-                db.all('SELECT A.name, A.description, A.subject, A.credits FROM courses as A FULL JOIN enrollment as B on B.course_id = A.id WHERE B.user_id = ?',[userID],function(err,row)
+                db.all('SELECT A.name, A.description, A.subject, A.credits FROM courses as A FULL JOIN enrollment as B on B.course_id = A.id WHERE B.user_id = ?',[id],function(err,row)
                     { 
                         if(err)
                             {
@@ -572,6 +616,7 @@ router.get('/courses',function(req,res)
                             }
                         else if (row)
                             {
+                                console.log("Sending row:"+row)
                                 res.status(200).send(row)
                                 return
                             }
@@ -740,9 +785,10 @@ router.post('/cart/:orderNum',function(req,res)
     })
 
 
-router.get('/cart/:orderNum',function(req,res)
+router.post('/getCart/:orderNum',function(req,res)
     {
         const {orderNum} = req.params
+        const {token} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -920,7 +966,7 @@ router.post("/enroll",function(req,res)
 
 
 
-router.get("/enroll",function(req,res)
+router.post("/checkEnroll",function(req,res)
 // Needs a body param of 
 //    {user_id:"user_id_goes_here"}
     {
