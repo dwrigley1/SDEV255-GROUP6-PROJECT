@@ -67,7 +67,7 @@ window.onload = async function () {
           console.error("Fetch crashed:", err);
         }
       });
-    }
+    }else if (!form){console.log("not finding form")}
   } else {
     showStudentUI();
   }
