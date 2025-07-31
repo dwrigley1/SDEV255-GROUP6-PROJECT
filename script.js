@@ -1,10 +1,8 @@
-console.log("script.js loaded"); // debugging
-
 if (typeof CryptoJS === "undefined") {
   alert("CryptoJS failure."); // debugging
 }
 
-let role = "student"; // default fallback
+let role = "student"; // default fallback, doesn't seem to be working..
 let creatorId = null;
 
 window.onload = async function () {
@@ -13,9 +11,9 @@ window.onload = async function () {
 // changing frontend to match backend
 
   if (!token) {
-    console.warn("No token found — redirecting to login");
+    console.warn("No token found");
     //window.location.href = "login.html"; // commented out, possible infinite loop
-    return;
+   // return;
   }
 
   try {
@@ -26,10 +24,10 @@ window.onload = async function () {
     console.error("Token decryption failed", err);
     alert("Your session is invalid. Please log in again.");
     localStorage.removeItem("token");
-    if (!window.location.href.includes("login.html")) {
-      window.location.href = "login.html";
+    //if (!window.location.href.includes("login.html")) {
+      //window.location.href = "login.html";
     }
-    return;
+    //return;
   }
 
   if (role === "teacher") {
@@ -80,7 +78,7 @@ window.onload = async function () {
     const card = renderCourseCard(course, role);
     courseSection.appendChild(card);
   });
-};
+//};
 
 function parseToken(token) {
   console.log("parse token function triggered");

@@ -10,9 +10,9 @@ const user_id = sessionStorage.getItem("user_id"); // new const variable
 // add a course //
 async function addCourse(){
     const course = {
-        courseId: document.querySelector("#courseId").value,
+        courseId: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
-        creditHours: document.querySelector("#creditHours").value,
+        creditHours: document.querySelector("#credits").value,
         description: document.querySelector("#description").value,
         creator_id: user_id
     }
@@ -37,9 +37,9 @@ async function addCourse(){
 // delete a course //
 async function deleteCourse(){
     const course = {
-        courseId: document.querySelector("#courseId").value,
+        courseId: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
-        creditHours: document.querySelector("#creditHours").value,
+        creditHours: document.querySelector("#credits").value,
         description: document.querySelector("#description").value,
         creator_id: user_id
     }
@@ -63,9 +63,9 @@ async function deleteCourse(){
 //edit a course //
 async function editCourse(){
     const course = {
-        courseId: document.querySelector("#courseId").value,
+        courseId: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
-        creditHours: document.querySelector("#creditHours").value,
+        creditHours: document.querySelector("#credits").value,
         description: document.querySelector("#description").value,
         creator_id: user_id
     }
