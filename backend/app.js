@@ -14,6 +14,7 @@ const sqlite3 = require('sqlite3').verbose();
 var cors= require('cors');
 const path =require('path');
 const fs = require('fs').promises;
+const fsb = require('fs');
 const { OAuth2Client } = require('google-auth-library');
 const session = require('express-session');
 const axios = require('axios');
@@ -61,7 +62,7 @@ const router = express.Router();
 //DB
 const fp_db = './backend_db.db'
 //checks if fb exists
-if (fs.existsSync(fp_db)) {
+if (fsb.existsSync(fp_db)) {
   console.log('Database exists. Connecting...');
 } else {
   console.log('Database does not exist. Creating a new one...');
