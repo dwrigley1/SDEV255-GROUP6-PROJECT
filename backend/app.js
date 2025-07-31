@@ -39,11 +39,11 @@ const app = express();
 app.use(express.json());
 const corsOptions = {
   origin: [
-    'http://localhost:3000',
+    'http://localhost',
     'https://dwrigley1.github.io/SDEV255-GROUP6-PROJECT',
     'https://dwrigley1.github.io',
     'https://sdev255-group6-project.onrender.com',
-    'http://localhost:5500'
+    '*'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
