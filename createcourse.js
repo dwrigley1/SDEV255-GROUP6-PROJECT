@@ -10,27 +10,26 @@ const user_id = sessionStorage.getItem("user_id"); // new const variable
 // add a course //
 async function addCourse(){
     const course = {
-        courseId: document.querySelector("#name").value,
+        name: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
-        creditHours: document.querySelector("#credits").value,
+        credits: document.querySelector("#credits").value,
         description: document.querySelector("#description").value,
         creator_id: user_id
     }
-    
-    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${user_id}`,{
+
+    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
         method: "POST",
-        headers:{
+        headers: {
             "Content-Type" : "application/json"
         },
         body: JSON.stringify(course)
-    })
-    if(response.ok){
-        const results = await response.json()
-        alert("Added course" + results._id)
-        document.querySelector("form").reset() // reset the form after adding a course
-    }
-    else{
-        document.querySelector("#error").innerHTML = "Cannot add course" // alerts the user of an error
+    });
+
+    if (response.ok) {
+        alert("Added course!");
+        document.querySelector("form").reset();
+    } else {
+        document.querySelector("#error").innerHTML = "Cannot add course";
     }
 }
 
