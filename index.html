@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
-  <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Class Scheduler</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -9,36 +9,86 @@
 </head>
 
 <body>
+  <script src="script.js"></script>
+
   <div class="topnav">
-    <!--<a href="shoppingcart.html">Shopping Cart</a> --> <!-- commented out, teacher does not need shopping cart -->
-    <a href="contact.html">Contact Us</a> <!-- if no functionality is added, can be commented out or left to have something on the page -->
+    <a href="shoppingcart.html">Shopping Cart</a>
+    <a href="contact.html">Contact Us</a>
   </div>
 
-  <h1 style="text-align: center;">Courses Offered</h1>
-  <div class="course-section" id="courseSection"></div>
 
-  <!-- new teacher functionality -->
-   <h1> Hello, Teacher! </h1>
-   <div id="teacherControls" style="display: none; margin: 2rem;">
-    <h2>Create New Course</h2>
-    <form id="createCourseForm">
-      <input type="text" id="name" placeholder="Course Name" required />
-      <input type="text" id="subject" placeholder="Subject" required />
-      <input type="number" id="credits" placeholder="Credit Hours" required />
-      <textarea id="description" placeholder="Description" required></textarea>
-      <button type="submit">Add Course</button>
-    </form>
+    <h1 style="text-align: center;">Courses Offered</h1>
+    <div class="course-section">
+      <div class="course-card">
+        <h4>ENGL 111 - English Composition - 3 Credit Hours</h4>
+        <p>Develops skills in writing, reading, critical thinking, and research with emphasis on academic writing forms.</p>
+        <button onclick="addToCart('ENGL 111 - English Composition')">Add to Cart</button>
+      </div>
+
+      <div class="course-card">
+        <h4>ENGL 202 - Creative Writing - 3 Credit Hours</h4>
+        <h4>Prerequisites - ENGL 111</h4>
+        <p>Introduces opportunities for self-expression through fiction, poetry, drama, and creative nonfiction.</p>
+        <button onclick="addToCart('ENGL 202 - Creative Writing')">Add to Cart</button>
+      </div>
+
+      <div class="course-card">
+        <h4>MATH 221 - Calculus for Technology I - 3 Credit Hours</h4>
+        <p>Covers limits, continuity, derivatives, integrals, and their applications in technology.</p>
+        <button onclick="addToCart('MATH 221 - Calculus for Technology I')">Add to Cart</button>
+      </div>
+
+      <div class="course-card">
+        <h4>MATH 222 - Calculus for Technology II - 3 Credit Hours</h4>
+        <h4>Prerequisites - MATH 221</h4>
+        <p>Covers transcendental functions, integration techniques, differential equations, and infinite series.</p>
+        <button onclick="addToCart('MATH 222 - Calculus for Technology II')">Add to Cart</button>
+      </div>
+
+      <div class="course-card">
+        <h4>BIOL 121 - General Biology I - 3 Credit Hours</h4>
+        <p>Introduces cell structure, photosynthesis, genetics, and biotechnology in prokaryotes and eukaryotes.</p>
+        <button onclick="addToCart('BIOL 121 - General Biology I')">Add to Cart</button>
+      </div>
+
+      <div class="course-card">
+        <h4>BIOL 122 - General Biology II - 3 Credit Hours</h4>
+        <h4>Prerequisites - BIOL 121</h4>
+        <p>Explores evolution, plant and animal function, anatomy, physiology, behavior, and ecology.</p>
+        <button onclick="addToCart('BIOL 122 - General Biology II')">Add to Cart</button>
+      </div>
+    </div>
   </div>
 
-  <!-- backend logic -------------- are these positional arguments?
-   const {name, description, subject, credits} = req.body
-        if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"})}
-        -->
+  <script>
+    function addToCart(courseName) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.push(courseName);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(courseName + ' added to cart!');
+    }
+  </script>
+
+
+<!-- This <script> hides shoppingcart.html from the teachers
+  & hides createcourse.html from students -->
+  <script>
+  const role = sessionStorage.getItem("user_role");
+  if (role === "teacher") {
+    const cartLink = document.querySelector('a[href="shoppingcart.html"]');
+    if (cartLink) cartLink.style.display = "none";
+  }
+  if (role === "student") {
+    // Hide teacher-only pages
+    const createLink = document.querySelector('a[href="createcourse.html"]');
+    if (createLink) createLink.style.display = "none";
+  }
+</script>
+
 
   <footer class="footer">
     &copy; 2025 Group 6 Class Scheduler
   </footer>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
-<!-- This page doesn't get used anymore now that the user's role gets analyzed before 
- redirecting them to the index page -->
+<!-- This page is only visibile to those 
+      with teacher login permissions -->
 
 <html lang="en">
 <head>
@@ -16,22 +16,21 @@
   <div class="topnav">
     <a href="shoppingcart.html">Shopping Cart</a>
     <a href="contact.html">Contact Us</a>
-    <a href="createcourse.html">Create</a>
   </div>
 
   <div class="main">
     <h1>Add, Edit, or Delete Courses</h1>
     <form>
-      <label for="courseId">Course ID:</label>
-      <input type="text" id="courseId" required>
+      <label for="name">Course Name</label>
+      <input type="text" id="name" required>
 
-      <label for="subject">Subject:</label>
+      <label for="subject">Subject</label>
       <input type="text" id="subject" required>
 
-      <label for="creditHours">Credit Hours:</label>
-      <input type="number" id="creditHours" min="1" max="4" required>
+      <label for="credits">Credit Hours</label>
+      <input type="number" id="credits" min="1" max="4" required>
 
-      <label for="description">Description:</label>
+      <label for="description">Description</label>
       <input type="text" id="description" required>
 
       <div class="button-group">
@@ -43,5 +42,21 @@
       <div id="error"></div>
     </form>
   </div>
+
+<!-- This <script> hides shoppingcart.html from the teachers
+  & hides createcourse.html from students -->
+  <script>
+  const role = sessionStorage.getItem("user_role");
+  if (role === "teacher") {
+    const cartLink = document.querySelector('a[href="shoppingcart.html"]');
+    if (cartLink) cartLink.style.display = "none";
+  }
+  if (role === "student") {
+    // Hide teacher-only pages
+    const createLink = document.querySelector('a[href="createcourse.html"]');
+    if (createLink) createLink.style.display = "none";
+  }
+</script>
+
 </body>
 </html>

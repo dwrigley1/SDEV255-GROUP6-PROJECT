@@ -85,3 +85,4 @@ async function editCourse(){
         document.querySelector("#error").innerHTML = "Cannot edit course"
     }
 }
+
