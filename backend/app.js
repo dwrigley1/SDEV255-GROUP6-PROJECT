@@ -70,6 +70,62 @@ if (fs.existsSync(fp_db)) {
 const db = new sqlite3.Database('./backend_db.db',sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,(err)=>{if(err){console.log(err)}else{console.log("Connected to sqlite database")}})
 const fp_schema = path.join(__dirname,"/DB/schema.sql")
 const fp_seed = path.join(__dirname,"/DB/seed.sql")
+async function start_db()
+    {
+        try
+            {
+                
+                const sql = await fs.readFile(fp_schema,"utf8");
+                console.log("starting up schema")
+                await new Promise((resolve,reject)=>
+                    {
+                        db.exec(sql,function(err)
+                            {
+                                if (err)
+                                    {
+                                        console.log(err)
+                                        reject(err);  
+                                    }
+                                else
+                                    {
+                                        console.log("resolved schema")
+                                        resolve();
+                                    }
+                            })
+                    })
+        console.log("Reading seed")
+        const sql2 = await fs.readFile(fp_seed,"utf8");
+        await new Promise((resolve,reject)=>
+            {
+                db.exec(sql2,function(err)
+                    {
+                        if (err)
+                            {
+                                console.log(err)
+                                reject(err);
+                            }
+                        else
+                        {
+                            console.log("resolving seed")
+                            resolve();
+                            console.log("db initialized")
+                        }
+                    })
+
+            })
+        } 
+        catch(e)
+        {
+            console.log(e)
+        }
+
+
+
+    }
+start_db()
+
+
+
 
 //OAuth
 const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
