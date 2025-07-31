@@ -193,12 +193,15 @@ router.get("/initialize",async function(req,res)
                                 console.log(err)
                                 reject(err);
                                 res.sendStatus(500)
+                                return
                             }
                         else
                         {
                             console.log("resolving seed")
                             resolve();
+                            console.log("db initialized")
                             res.sendStatus(200)
+                            return
                         }
                     })
                 // db.get("SELECT * FROM users",(err,rows)=>
@@ -218,6 +221,8 @@ router.get("/initialize",async function(req,res)
         catch(e)
         {
             console.log(e)
+            res.sendStatus(500)
+            return
 
         }
 
@@ -289,7 +294,9 @@ router.post("/auth/:minAuth",function(req,res)
             }
         catch(err)
             {
-
+                console.log(err)
+                res.status(500).send({error:err})
+                return
 
             }
     })
@@ -339,6 +346,8 @@ router.get('/login/:email/:password',function(req,res)
             catch(e)
                 {
                     console.log(e)
+                    res.status(500).send({error:e})
+                    return
                 }
     });
 
@@ -443,6 +452,8 @@ router.put('/login',function(req,res)
         catch(e)
             {
                 console.log(e)
+                res.status(500).send(e);
+                return;
             }
     })
 
@@ -471,6 +482,7 @@ router.delete('/login',function(req,res)
                             }
                         else
                             {
+                                console.log("user deleted")
                                 res.sendStatus(200)
                                 return
                             }    
@@ -479,6 +491,8 @@ router.delete('/login',function(req,res)
         catch(e)
             {
                 console.log(e)
+                res.status(500).send({error:e})
+                return;
             }
     })
 
@@ -502,7 +516,7 @@ router.post('/courses',function(req,res)
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
-        console.log(id,email)
+        console.log(id,email+"Are present in token")
         //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
         if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"});return;}
@@ -510,6 +524,7 @@ router.post('/courses',function(req,res)
             {
 
                 //checks if user is a teacher
+                console.log("Checking if user is teacher now")
                 db.run(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = "teacher" `,id,function(err)
                     {
                         //if not teacher
@@ -522,6 +537,7 @@ router.post('/courses',function(req,res)
                             //if teacher then creates course
                         else
                             {
+                                console.log("User is teacher and now inserting into courses")
                                const insertStmt= db.prepare('INSERT INTO courses ( name, description, subject, credits, creator_id) values (?,?,?,?,?)')
                                 insertStmt.run( name, description, subject, credits, id,function(err)
                                 {
@@ -533,6 +549,7 @@ router.post('/courses',function(req,res)
                                         }
                                     else
                                         {
+                                            console.log("Course successfully created")
                                             res.status(200).send({"Pass":"Yea"})
                                             return;
                                         }
@@ -543,6 +560,8 @@ router.post('/courses',function(req,res)
         catch(e)
             {
                 console.log(e)
+                res.status(500).send({error:err})
+                return;
             }
     })
 
@@ -552,9 +571,11 @@ router.get('/courses/',function(req,res)
         
         try
             { 
+                console.log("Starting /courses")
                 //login function checking db
                 db.all('SELECT id, name , description,subject,credits FROM courses',function(err,row)
                     { 
+                        console.log("Searched through potential courses")
                         if(err)
                             {
                                 console.log(err)
@@ -570,6 +591,8 @@ router.get('/courses/',function(req,res)
                         else
                             {
                                 console.log("Nothing to seee here")
+                                res.status(404).send("Nothing was found")
+                                return
                             }
                     })
             }
@@ -592,7 +615,7 @@ router.get('/courses/',function(req,res)
 router.post('/coursesList/',function(req,res)
     {
         const {token}= req.body;
-        console.log(token)
+        console.log(token+ " for coursesList")
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -606,6 +629,7 @@ router.post('/coursesList/',function(req,res)
         try
             { 
                 //login function checking db
+                console.log("returning all instances of userid in enrollment and returning classes now")
                 db.all('SELECT A.name, A.description, A.subject, A.credits FROM courses as A FULL JOIN enrollment as B on B.course_id = A.id WHERE B.user_id = ?',[id],function(err,row)
                     { 
                         if(err)
@@ -616,13 +640,15 @@ router.post('/coursesList/',function(req,res)
                             }
                         else if (row)
                             {
-                                console.log("Sending row:"+row)
+                                console.log("Sending results:"+row)
                                 res.status(200).send(row)
                                 return
                             }
                         else
                             {
                                 console.log("Nothing to seee here")
+                                res.status(404).send({error:"Nothing was found for users"})
+                                return
                             }
                     })
             }
@@ -642,6 +668,7 @@ router.put('/courses/:coursesID',function(req,res)
         //coursesID put in the url 
         const {coursesID} = req.params
         const {token} = req.body
+        console.log(token+ " for put for /courses")
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -661,6 +688,7 @@ router.put('/courses/:coursesID',function(req,res)
         try
             {
                 //update courses
+                console.log("changes are being made right now to  courses")
                 console.log(`Value: ${Object.values(courseChanges)[0]} \n ${coursesID}`)
                 db.run(`UPDATE courses SET ${Object.keys(courseChanges)} = ? WHERE id = ? and creator_id = ?`,[Object.values(courseChanges)[0],coursesID,id],function(err)
                     {
@@ -690,8 +718,10 @@ router.put('/courses/:coursesID',function(req,res)
  router.delete('/courses/:coursesID',function(req,res)
     {
         const {coursesID} = req.params
+        
         try
             {
+                console.log("Deleting courseID")
                 db.run(`DELETE FROM courses WHERE id =? `,[coursesID],function(err)
                     {
                         if (err)
@@ -702,6 +732,7 @@ router.put('/courses/:coursesID',function(req,res)
                             }
                         else
                             {
+                                console.log("courses have been deleted")
                                 res.send(200)
                                 return
                             }
@@ -711,6 +742,8 @@ router.put('/courses/:coursesID',function(req,res)
         catch(e)
             {
                 console.log(e)
+                res.status(500).send({error:e})
+                return
             }
     })
 
@@ -725,6 +758,7 @@ router.post('/cart/:orderNum',function(req,res)
         const {orderNum}= req.params
         //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
         const {token,coursesID} = req.body
+        console.log("creating cart with order num: "+orderNum)
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -741,6 +775,7 @@ router.post('/cart/:orderNum',function(req,res)
                 //create cart    
                 let errors = []
                 let inserted = 0
+                console.log("trying to create order in /cart")
                 const insertStmt = db.prepare(`INSERT INTO cart (user_id,course_id,order_num) VALUES (?,?,?,?)`)
                 for (const courseID of coursesID)
                     {
@@ -758,6 +793,7 @@ router.post('/cart/:orderNum',function(req,res)
                                     }
                                 else
                                     {
+                                        console.log(courseID+" Sucessfully inserted")
                                         inserted += 1;        
                                     }
 
@@ -767,10 +803,12 @@ router.post('/cart/:orderNum',function(req,res)
                                     {
                                         if (errors.length>0)
                                             {
+                                                console.log(errors+" was the cause for issue")
                                                 return res.status(500).send({error:errors})
                                             }
                                         else
                                             {
+                                                console.log("Everything worked out just fine and cart was created")
                                                 return res.sendStatus(200)   
                                             }
                                     } 
@@ -781,6 +819,7 @@ router.post('/cart/:orderNum',function(req,res)
         catch(e)
             {
                 console.log(e)
+                return res.status(500).send({error:e})
             } 
     })
 
@@ -789,6 +828,7 @@ router.post('/getCart/:orderNum',function(req,res)
     {
         const {orderNum} = req.params
         const {token} = req.body
+        console.log("/getCart started by: "+token)
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -802,6 +842,7 @@ router.post('/getCart/:orderNum',function(req,res)
         try
             {
                 //let result = "result of parsing"//Fetch orderNum
+                console.log("getting cart with user_id and order_num now.")
                 db.all("SELECT * FROM cart WHERE user_id = ? AND order_num = ?",[user_id,orderNum],function(err,row)
                 {
                     if(err)
@@ -811,6 +852,7 @@ router.post('/getCart/:orderNum',function(req,res)
                         }
                     else
                         {
+                            console.log("Everything worked out amazing")
                             res.status(200).send(row)
                             return
                         }
@@ -845,6 +887,7 @@ router.put('/cart/:orderNum',function(req,res)
             {   let errors = []
                 let updated = 0
                 console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                console.log("Editiing cart now")
                 for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
                         console.log(i)
@@ -852,11 +895,12 @@ router.put('/cart/:orderNum',function(req,res)
                             { 
                                 if(err)
                                     {
+                                        console.log(err)
                                         errors.push(err)
                                     }
                                 else
                                     {
-                                        console.log("test", updated)
+                                        console.log("Updated: ", updated)
                                         updated += 1;
                                     }
                             })
@@ -867,10 +911,12 @@ router.put('/cart/:orderNum',function(req,res)
                     {
                         if (errors.length>0)
                             {
+                                console.log(errors)
                                 return res.status(500).send({errors:errors})
                             }
                         else
                         {
+                            console.log("Successful in changing cart")
                             return res.sendStatus(200)
                         }
                     } 
@@ -879,6 +925,7 @@ router.put('/cart/:orderNum',function(req,res)
         catch(e)
             {
                 console.log(e)
+                return res.status(500).send({errors:e})
             }
     })
 
@@ -899,6 +946,7 @@ router.delete('/cart/:orderNum',function(req,res)
                     }
         try
             {
+                console.log("Starting deletion of cart")
                 db.run('DELETE FROM cart WHERE user_id = ? AND order_num= ?',[id,orderNum],function(err)
                     {
                         if(err)
@@ -910,6 +958,7 @@ router.delete('/cart/:orderNum',function(req,res)
                             }
                         else
                             {
+                                console.log("sucessfully done")
                                 res.send(200)
                                 return
                             }
@@ -941,6 +990,7 @@ router.post("/enroll",function(req,res)
                         return
                     }
                 if(!id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
+                console.log("enrolling user now!")
                 db.run("INSERT into enrollment(user_id,course_id) values (?,?)",[id,courseID],function(err)
                     {
                         if(err)
@@ -951,6 +1001,7 @@ router.post("/enroll",function(req,res)
                             }
                         else
                             {
+                                console.log("User is enrolled in the classes now")
                                 res.status(200).send({"Status":"Success"})
                                 return
                             }
@@ -994,6 +1045,7 @@ router.post("/checkEnroll",function(req,res)
                             } 
                         else if(row)
                             {
+                                console.log("Found classes that user is enrolled in")
                                 res.status(200).send(row)
                                 return
                             }
@@ -1034,6 +1086,7 @@ router.put("/enroll",function(req,res)
             {   let errors = []
                 let updated = 0
                 console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
+                console.log("Changing enroll now")
                 for (let i=0;i<=Object.keys(changes).length-1;i++)
                     {
                         console.log(i)
@@ -1041,11 +1094,12 @@ router.put("/enroll",function(req,res)
                             { 
                                 if(err)
                                     {
+                                        console.log(err)
                                         errors.push(err)
                                     }
                                 else
                                     {
-                                        console.log("test", updated)
+                                        console.log("updated", updated)
                                         updated += 1;
                                     }
                             })
@@ -1056,10 +1110,12 @@ router.put("/enroll",function(req,res)
                     {
                         if (errors.length>0)
                             {
+                                console.log("Change of enrollment failed")
                                 return res.status(500).send({errors:errors})
                             }
                         else
                         {
+                            console.log("Change of enrollment worked")
                             return res.sendStatus(200)
                         }
                     } 
@@ -1091,7 +1147,7 @@ router.delete("/enroll",function(req,res)
                     }
                 //Make sure to send as course_id
 
-                console.log(`${id}: Course_id${course_id}`)
+                console.log(`deleting ${id}: from Course_id${course_id}`)
                 db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[id,course_id],function(err)
                     {
                         if(err)
@@ -1102,6 +1158,7 @@ router.delete("/enroll",function(req,res)
                             }
                         else
                             {
+                                console.log("enrollment was deleted")
                                 res.sendStatus(200)
                                 return
 
