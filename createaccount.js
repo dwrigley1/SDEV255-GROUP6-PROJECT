@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      const response = await fetch("https://sdev255-group6-project.onrender.com/api/users", {
+      const response = await fetch("https://sdev255-group6-project.onrender.com/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
