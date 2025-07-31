@@ -4,21 +4,16 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-// user needs defined first..
+    const user = {
+      first_name: document.querySelector("#fname").value,
+      last_name: document.querySelector("#lname").value,
+      email: document.querySelector("#email").value,
+      password: document.querySelector("#password").value,
+      role: document.querySelector("#role").value,
+    };
 
-   const user = {
-    id: Date.now().toString(), // 
-    first_name: document.querySelector("#fname").value,
-    last_name: document.querySelector("#lname").value,
-    email: document.querySelector("#email").value,
-    password: document.querySelector("#password").value,
-    role: document.querySelector("#role").value,
-  };
-
-
-    // correct URL now?
     try {
-      const response = await fetch("https://sdev255-group6-project.onrender.com/api/login", {
+      const response = await fetch("https://sdev255-group6-project.onrender.com/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,13 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Account successfully created!");
         window.location.href = "login.html";
       } else {
-        const err = await response.text(); // JSON ??
+        const err = await response.text(); // or .json() depending on backend
         console.error("Backend error:", err);
         alert("Unsuccessful :'( ");
       }
     } catch (error) {
       console.error("Network error:", error);
-      alert("If you're seeing this something broke :( ");
+      alert("If you're seeing this, something broke :( ");
     }
   });
 });
+
