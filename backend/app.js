@@ -59,7 +59,15 @@ app.use(session({
 const router = express.Router();
 
 //DB
-const db = new sqlite3.Database('./backend_db.db',(err)=>{})
+const fp_db = './backend_db.db'
+//checks if fb exists
+if (fs.existsSync(fp_db)) {
+  console.log('Database exists. Connecting...');
+} else {
+  console.log('Database does not exist. Creating a new one...');
+}
+//If error here delete out ,sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE
+const db = new sqlite3.Database('./backend_db.db',sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,(err)=>{if(err){console.log(err)}else{console.log("Connected to sqlite database")}})
 const fp_schema = path.join(__dirname,"/DB/schema.sql")
 const fp_seed = path.join(__dirname,"/DB/seed.sql")
 
