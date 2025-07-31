@@ -71,7 +71,7 @@ window.onload = async function () {
   }
 
   const courseSection = document.getElementById("courseSection");
-  const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/0");
+  const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/");
   const courses = await response.json();
 
   courses.forEach(course => {
