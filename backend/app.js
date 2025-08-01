@@ -262,7 +262,7 @@ router.get('/login/:email/:password',async function(req,res)
                 { 
                     
                     console.log(`${email}:${password}`)
-                    const queryStmt = await User.find({email:email,password:password})
+                    const queryStmt = await User.findOne({email:email,password:password})
                         
                             console.log("Callback function for login querystatment is starting")
                             if (!queryStmt)
@@ -273,7 +273,8 @@ router.get('/login/:email/:password',async function(req,res)
                                 }
                             else if (queryStmt)
                                 {
-                                    console.log(`${JSON.stringify(queryStmt)} was found`)
+                                    completedQuery = JSON.stringify(queryStmt)
+                                    console.log(`${JSON.stringify(queryStmt)} was found for ${queryStmt._id}`)
                                     const token = `id:${queryStmt._id},email:${queryStmt.email},password:${queryStmt.password},role:${queryStmt.role}`;
                                     const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
                                     res.status(200).send({token:encryptedToken,role:queryStmt.role})
@@ -329,8 +330,8 @@ router.post('/login',async function(req,res)
                     const createUser = await newUser.save()   
                     if (!createUser)
                         {
-                            console.error("Error inserting change:",err)
-                            res.status(500).send({error:err})
+                            console.error("Error inserting user:",)
+                            res.status(500).send({error:"Wasn't able to insert"})
                             return
                         }
                     else 
@@ -481,7 +482,7 @@ router.post('/courses',async function(req,res)
                                         }
                                     else if (createdCourse)
                                         {
-                                            console.log("Course successfully created")
+                                            console.log("Course successfully created: "+createdCourse._id)
                                             res.status(200).send({"Pass":"Yea"})
                                             return;
                                         }
@@ -561,19 +562,24 @@ router.post('/coursesList/',async function(req,res)
         try
             { 
                 //login function checking db
-                console.log("returning all instances of userid in enrollment and returning classes now")
+                console.log("returning all instances of userid in enrollment and returning classes now for :"+id)
+                console.log("is id valid object id: "+mongoose.isValidObjectId(id))
                 const EnrolledCourses = await Enrollment.aggregate([
+                    {
+                        $match:{"user_id":new mongoose.Types.ObjectId(id)}
+                    },
                     {
                         $lookup: {
                         from: 'courses', // collection name in MongoDB
-                        localField: 'creator_id',
-                        foreignField: 'user_id',
-                        as: 'enrollDetails'
+                        localField: 'course_id',
+                        foreignField: '_id', 
+                        as: 'CourseDetails'
                         }
                     },
                     {
-                        $unwind: '$enrollDetails'
+                        $unwind: '$CourseDetails'
                     }
+                    
                     ])
     
                     { 
@@ -585,7 +591,7 @@ router.post('/coursesList/',async function(req,res)
                             }
                         else if (EnrolledCourses)
                             {
-                                console.log("Sending results:"+EnrolledCourses)
+                                console.log("Sending results:"+JSON.stringify(EnrolledCourses))
                                 res.status(200).send(EnrolledCourses)
                                 return
                             }
@@ -796,7 +802,7 @@ router.post('/getCart/:orderNum',async function(req,res)
     })
 
 
-router.put('/cart/:orderNum/courseID',async function(req,res)
+router.put('/cart/:orderNum/:courseID',async function(req,res)
     {
         const {orderNum,courseID} = req.params
         const {token,changes} = req.body
@@ -900,15 +906,15 @@ router.post("/enroll",async function(req,res)
                     {
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
-                    }
+                    } 
                 if(!id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
-                console.log("enrolling user now!")
+                console.log("enrolling user now! of"+courseID+"for user "+id)
                 const enroll = await Enrollment.insertOne({user_id:id,course_id:courseID})
                     
-                        if(err)
+                        if(!enroll)
                             {
-                                console.log(err)
-                                res.status(505).send(err)
+                                console.log("Couldnt enroll")
+                                res.status(505).send("Couldnt enroll")
                                 return
                             }
                         else
@@ -951,8 +957,8 @@ router.post("/checkEnroll",async function(req,res)
                     
                 if(!enrolled)
                     {
-                        console.log(err)
-                        res.status(500).send(err);
+                        console.log("Error finding enrollment")
+                        res.status(500).send("Error finding enrollment");
                         return
                     } 
                 else if(enrolled)
