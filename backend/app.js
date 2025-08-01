@@ -61,8 +61,8 @@ const router = express.Router();
 
 //DB
 const connecttoDB = require("./DB/db");
-const { User, Course } = require("./DB/models");
-
+const { User, Course , Cart, Enrollment} = require("./DB/models");
+connecttoDB()
 
 //checks if fb exists
 
@@ -164,61 +164,73 @@ router.get('/session', async (req, res) => {
 
 
 //auth
-router.post("/auth/:minAuth",function(req,res)
+router.post("/auth/:minAuth", async function(req,res)
     {
         try
             {
-                const{minAuth} = req.params.minAuth
+                console.log("user Attempting to be authenticated")
+                const{minAuth} = req.params
+                
+                if(minAuth == "student" ||minAuth =="teacher")
+                    {
+                        console.log("minimum auth is "+minAuth)
+                        const bytes = CryptoJS.AES.decrypt(req.body.token, SECRET_KEY);
+                        const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+                        //comment out before submitting
+                        console.log("Decrypted Token:", decryptedToken);
+                        //
+                        const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
+                        const{id,email,password,role} = (new_params)
+                        if(!id || !email || !password ||!role)
+                            {
+                                console.log("Missing info in token")
+                                res.status(503).send({error:"Missing id/email/password/role"})
+                                return
+                            }
+                        else
+                            {
+                                const queryUser = await User.findOne({email:email})
+                                
+                                    
+                                    if(!queryUser)
+                                        {
+                                            res.status(501).send({error:err})
+                                            return
+                                        }
+                                    else if(queryUser)
+                                        {
+                                            console.log("Queried user: "+JSON.stringify(queryUser))
+                                            if(queryUser.role!=role)
+                                                {
+                                                    console.log(`DB role: ${queryUser.role} != Provided Role :${role}`)
+                                                    res.status(400).send({error:"Dont lie"})
+                                                    return
+                                                }
+                                            else if(minAuth=="teacher" && role!="teacher")
+                                                {
+                                                    console.log(`MinAuth :${minAuth} != Role: ${role}`)
+                                                    res.status(500).send({auth:false})
+                                                    return
+                                                }
+                                            else
+                                                {
+                                                    console.log(console.log(`MinAuth :${minAuth} != Role: ${role}`))
+                                                    console.log(`User: ${id} is approved for content`)
+                                                    res.status(200).send({auth:true})
+                                                    return
+                                                }
+                                        }
+                            }
 
-                const bytes = CryptoJS.AES.decrypt(req.body.token, SECRET_KEY);
-                const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
-                //comment out before submitting
-                console.log("Decrypted Token:", decryptedToken);
-                //
-                const new_params = Object.fromEntries(decryptedToken.split(",").map(pair=>pair.split(":")))
-                const{id,email,password,role} = (new_params)
-                if(!id || !email || !password ||!role)
-                    {
-                        console.log("Missing info in token")
-                        res.status(503).send({error:"Missing id/email/password/role"})
-                        return
-                    }
-                else
-                    {
-                        const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],function (err,row)
+
+                        
+
+                    }else
                         {
-                            if(err)
-                                {
-                                    res.status(501).send({error:err})
-                                    return
-                                }
-                            else if(row)
-                                {
-                                    if(row.role!=role)
-                                        {
-                                            console.log(`DB role: ${row.role} != Provided Role :${role}`)
-                                            res.status(400).send({error:"Dont lie"})
-                                            return
-                                        }
-                                    else if(minAuth=="teacher" && role!="teacher")
-                                        {
-                                            console.log(`MinAuth :${minAuth} != Role: ${role}`)
-                                            res.status(500).send({auth:false})
-                                            return
-                                        }
-                                    else
-                                        {
-                                            console.log(console.log(`MinAuth :${minAuth} != Role: ${role}`))
-                                            console.log(`${id} is approved for content`)
-                                            res.status(200).send({auth:true})
-                                            return
-                                        }
-                                }
-
-
-                        })
-
-                    }
+                            console.log("URL param isnt student or teacher");
+                            res.status(500).send("Url param isn't correct");
+                            return;
+                        }
 
 
 
@@ -238,7 +250,7 @@ router.post("/auth/:minAuth",function(req,res)
 
 
 //login and validation
-router.get('/login/:email/:password',function(req,res)
+router.get('/login/:email/:password',async function(req,res)
     {
         // how to decrypt the token
         // const bytes = CryptoJS.AES.decrypt(encryptedToken, secretKey);
@@ -250,21 +262,21 @@ router.get('/login/:email/:password',function(req,res)
                 { 
                     
                     console.log(`${email}:${password}`)
-                    const queryStmt = db.get('SELECT * FROM users WHERE email = ? AND password = ?',[email,password],(err,row)=>
-                        {
+                    const queryStmt = await User.find({email:email,password:password})
+                        
                             console.log("Callback function for login querystatment is starting")
-                            if (err)
+                            if (!queryStmt)
                                 {
                                     console.log(`Oh man there was an error :${err}`)
                                     res.status(500).send({error:err})
                                     return
                                 }
-                            else if (row)
+                            else if (queryStmt)
                                 {
-                                    console.log(`${JSON.stringify(row)} was found`)
-                                    const token = `id:${row.id},email:${row.email},password:${row.password},role:${row.role}`;
+                                    console.log(`${JSON.stringify(queryStmt)} was found`)
+                                    const token = `id:${queryStmt._id},email:${queryStmt.email},password:${queryStmt.password},role:${queryStmt.role}`;
                                     const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
-                                    res.status(200).send({token:encryptedToken,role:row.role})
+                                    res.status(200).send({token:encryptedToken,role:queryStmt.role})
                                     return
                                 }
                             else
@@ -273,7 +285,7 @@ router.get('/login/:email/:password',function(req,res)
                                     res.sendStatus(404)
                                     return
                                 }    
-                    })
+                
             }
             catch(e)
                 {
@@ -288,7 +300,7 @@ router.get('/login/:email/:password',function(req,res)
 
 //create user
 
-router.post('/login',function(req,res)
+router.post('/login',async function(req,res)
     {
     
         const {email,password,first_name,last_name,role} = req.body
@@ -301,33 +313,32 @@ router.post('/login',function(req,res)
         //             "last_name":"burr",
         //              "role":"teacher"
         //         }`
-
-        
-
-
             try
                 {
                     //insert statment
                     console.log(`${email}:${password}:${first_name},${last_name} inserting into users`)
                     //const created_id = db.run("SELECT COUNT(id) From users")
-                    const insertStmt = db.prepare('INSERT INTO users (email,password,first_name,last_name,role) values (?,?,?,?,?)')
-                    insertStmt.run(email,password,first_name,last_name,role,function(err)
-                        { 
-                            if (err)
-                                {
-                                    console.error("Error inserting change:",err)
-                                    res.status(500).send({error:err})
-                                    return
-                                }
-                            else 
-                                {
-                                    console.log("Success!")
-                                    res.sendStatus(200);
-                                    return
-                                };
-                            //frees up reasources and commits
-                            insertStmt.finalize();
+                    const newUser = new User(
+                        {
+                            email:email,
+                            password:password,
+                            first_name:first_name,
+                            last_name:last_name,
+                            role:role
                         })
+                    const createUser = await newUser.save()   
+                    if (!createUser)
+                        {
+                            console.error("Error inserting change:",err)
+                            res.status(500).send({error:err})
+                            return
+                        }
+                    else 
+                        {
+                            console.log("Success!")
+                            res.sendStatus(200);
+                            return
+                        };         
                 }
             catch(e)
                 {
@@ -337,7 +348,7 @@ router.post('/login',function(req,res)
                 }
     });
 
-router.put('/login',function(req,res)
+router.put('/login',async function(req,res)
     {
         const {token}= req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
@@ -354,32 +365,22 @@ router.put('/login',function(req,res)
         // struture for puts are {column:value}
        console.log(changes)
         try
-            {   
-                let errors = []
-                let updated = 0
-                //console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
-                for (let i=0;i<=Object.keys(changes).length-1;i++)
+            {         
+                console.log("User is being updated")
+                const update = await User.updateOne({email:email,password:password},changes)   
+                if(!update)
                     {
-                        console.log(i,Object.keys(changes)[i])
-                        db.run(`UPDATE users SET ${Object.keys(changes)[i]}= ? WHERE email = ?`,[Object.values(changes)[i],email],(err)=>
-                            { 
-                                if(err)
-                                    {
-                                        console.log(err);
-                                        res.status(500).send(err);
-                                        return;
-                                    }
-                                else
-                                    {
-                                        console.log("test", updated)  
-                                    }
-                            })
-                            
+                        console.log("Error when updating check changes");
+                        res.status(500).send("Error when updating check changes sent");
+                        return;
                     }
-                console.log(`If it existed it changed`)
-                res.sendStatus(200)
-                return
-
+                else
+                    {
+                        console.log("updated: "+ update);
+                        console.log(`If it existed it changed`);
+                        res.sendStatus(200);
+                        return;
+                            }
             }   
         catch(e)
             {
@@ -389,7 +390,7 @@ router.put('/login',function(req,res)
             }
     })
 
-router.delete('/login',function(req,res)
+router.delete('/login',async function(req,res)
     {
         const {token} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
@@ -404,21 +405,22 @@ router.delete('/login',function(req,res)
                     }
         try
             {
-                db.run(`DELETE FROM users WHERE ID =?`,[id],function(err)
-                    {
-                        if(err)
+                const deleted = await User.deleteOne({email:email,password:password})
+                
+                    
+                        if(!deleted)
                             {
-                                console.log(err)
-                                res.status(500).send({error:err})
+                                console.log("User wasnt deleted")
+                                res.status(500).send({error:"User wasn't deleted"})
                                 return;
                             }
-                        else
+                        else if(deleted)
                             {
                                 console.log("user deleted")
-                                res.sendStatus(200)
-                                return
+                                res.sendStatus(200);
+                                return;
                             }    
-                    })
+                    
             }
         catch(e)
             {
@@ -433,7 +435,7 @@ router.delete('/login',function(req,res)
 
 //courses
 
-router.post('/courses',function(req,res)
+router.post('/courses',async function(req,res)
     {
         const {token}= req.body;
         console.log(token)
@@ -457,37 +459,35 @@ router.post('/courses',function(req,res)
 
                 //checks if user is a teacher
                 console.log("Checking if user is teacher now")
-                db.run(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = "teacher" `,id,function(err)
-                    {
+                const isTeacher = await User.findOne({email:email,password:password,role:"teacher"})
+                    
                         //if not teacher
-                        if(err)
+                        if(!isTeacher)
                             {
-                                console.log(err)
-                                res.status(500).send({error:err})
+                                console.log("User didnt pass the check")
+                                res.status(500).send({error:"Couldnt find user info that was of the teacher role."})
                                 return;
                             }
                             //if teacher then creates course
-                        else
+                        else if(isTeacher)
                             {
                                 console.log("User is teacher and now inserting into courses")
-                               const insertStmt= db.prepare('INSERT INTO courses ( name, description, subject, credits, creator_id) values (?,?,?,?,?)')
-                                insertStmt.run( name, description, subject, credits, id,function(err)
-                                {
-                                    if(err)
+                                const createdCourse = await Course.insertOne({name:name, description:description, subject:subject, credits:credits,creator_id:id})
+                                    if(!createdCourse)
                                         {
-                                            console.log(err)
-                                            res.status(500).send({error:err})
+                                            console.log("Course wasnt created there was an error")
+                                            res.status(500).send({error:"Course couldn't be created"})
                                             return;
                                         }
-                                    else
+                                    else if (createdCourse)
                                         {
                                             console.log("Course successfully created")
                                             res.status(200).send({"Pass":"Yea"})
                                             return;
                                         }
-                                })
+                                
                             }    
-                    })
+                    
             }
         catch(e)
             {
@@ -498,26 +498,26 @@ router.post('/courses',function(req,res)
     })
 
 
-router.get('/courses/',function(req,res)
+router.get('/courses/',async function(req,res)
     {
         
         try
             { 
                 console.log("Starting /courses")
                 //login function checking db
-                db.all('SELECT id, name , description,subject,credits FROM courses',function(err,row)
-                    { 
+                const queryStmt= await Course.find({})
+                    
                         console.log("Searched through potential courses")
-                        if(err)
+                        if(!queryStmt)
                             {
-                                console.log(err)
-                                res.status(500).send({error:err})
+                                console.log("couldnt find any courses")
+                                res.status(500).send({error:"No courses with found with query"})
                                 return
                             }
-                        else if (row)
+                        else if (queryStmt)
                             {
-                                console.log("Sending all course rows now")
-                                res.status(200).send(row)
+                                console.log("Sending all course queryStmts now")
+                                res.status(200).send(queryStmt)
                                 return
                             }
                         else
@@ -526,7 +526,7 @@ router.get('/courses/',function(req,res)
                                 res.status(404).send("Nothing was found")
                                 return
                             }
-                    })
+                    
             }
         catch(e)
             {
@@ -544,7 +544,7 @@ router.get('/courses/',function(req,res)
 
 
 
-router.post('/coursesList/',function(req,res)
+router.post('/coursesList/',async function(req,res)
     {
         const {token}= req.body;
         console.log(token+ " for coursesList")
@@ -562,18 +562,31 @@ router.post('/coursesList/',function(req,res)
             { 
                 //login function checking db
                 console.log("returning all instances of userid in enrollment and returning classes now")
-                db.all('SELECT A.name, A.description, A.subject, A.credits FROM courses as A FULL JOIN enrollment as B on B.course_id = A.id WHERE B.user_id = ?',[id],function(err,row)
+                const EnrolledCourses = await Enrollment.aggregate([
+                    {
+                        $lookup: {
+                        from: 'courses', // collection name in MongoDB
+                        localField: 'creator_id',
+                        foreignField: 'user_id',
+                        as: 'enrollDetails'
+                        }
+                    },
+                    {
+                        $unwind: '$enrollDetails'
+                    }
+                    ])
+    
                     { 
-                        if(err)
+                        if(!EnrolledCourses)
                             {
-                                console.log(err)
-                                res.status(500).send({error:err})
+                                console.log("could get enrolled classes")
+                                res.status(500).send({error:"Couldn't find enrolled classes"})
                                 return
                             }
-                        else if (row)
+                        else if (EnrolledCourses)
                             {
-                                console.log("Sending results:"+row)
-                                res.status(200).send(row)
+                                console.log("Sending results:"+EnrolledCourses)
+                                res.status(200).send(EnrolledCourses)
                                 return
                             }
                         else
@@ -582,8 +595,8 @@ router.post('/coursesList/',function(req,res)
                                 res.status(404).send({error:"Nothing was found for users"})
                                 return
                             }
-                    })
-            }
+                    
+            }}
         catch(e)
             {
                 console.log(e)
@@ -622,22 +635,21 @@ router.put('/courses/:coursesID',function(req,res)
                 //update courses
                 console.log("changes are being made right now to  courses")
                 console.log(`Value: ${Object.values(courseChanges)[0]} \n ${coursesID}`)
-                db.run(`UPDATE courses SET ${Object.keys(courseChanges)} = ? WHERE id = ? and creator_id = ?`,[Object.values(courseChanges)[0],coursesID,id],function(err)
-                    {
-                        if (err)
+                const updatedCourse = Course.updateOne({_id:coursesID})
+                        if (!updatedCourse)
                             {
-                                console.log(err)
+                                console.log("Couldn't update course")
                                 res.status(500).send({error:err})
                                 return
                             }
-                        else
+                        else if (updatedCourse)
                             {
                         
-                                console.log(courseChanges)
+                                console.log("course updated")
                                 res.send(200)
                                 return
                             }
-                    })
+                    
             }
         catch(e)
             {
@@ -647,28 +659,28 @@ router.put('/courses/:coursesID',function(req,res)
             }
     })
 
- router.delete('/courses/:coursesID',function(req,res)
+ router.delete('/courses/:coursesID',async function(req,res)
     {
         const {coursesID} = req.params
         
         try
             {
                 console.log("Deleting courseID")
-                db.run(`DELETE FROM courses WHERE id =? `,[coursesID],function(err)
+                const deleteCourse = await Course.deleteOne({_id:coursesID})
+                    
+                if (!deleteCourse)
                     {
-                        if (err)
-                            {
-                                console.log(err)
-                                res.status(500).send({error:err})
-                                return
-                            }
-                        else
-                            {
-                                console.log("courses have been deleted")
-                                res.send(200)
-                                return
-                            }
-                    })
+                        console.log("Couldn't delete course")
+                        res.status(500).send({error:"Couldn't delete course"})
+                        return
+                    }
+                else if (deleteCourse)
+                    {
+                        console.log("course has been deleted")
+                        res.send(200)
+                        return
+                    }
+                        
 
             }
         catch(e)
@@ -685,7 +697,7 @@ router.put('/courses/:coursesID',function(req,res)
 
 
 //cart
-router.post('/cart/:orderNum',function(req,res)
+router.post('/cart/:orderNum',async function(req,res)
     {
         const {orderNum}= req.params
         //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
@@ -708,45 +720,32 @@ router.post('/cart/:orderNum',function(req,res)
                 let errors = []
                 let inserted = 0
                 console.log("trying to create order in /cart")
-                const insertStmt = db.prepare(`INSERT INTO cart (user_id,course_id,order_num) VALUES (?,?,?,?)`)
                 for (const courseID of coursesID)
                     {
-                
-                        //console.log(`I :${i}`)
-                        //console.log(`coursesID ${coursesID.length}`)
                         console.log(`coursesID elements :${courseID}`)
-                    
-                        insertStmt.run([orderNum,id,courseID,orderNum],function(err)
+                        const createdCart = await Cart.insertOne({user_id:id,course_id:courseID,order_num:orderNum})  
+                        if (!createdCart)
                             {
-                                if (err)
-                                    {
-                                        console.log(`Error SQL: ${err}`)
-                                        errors.push(err);
-                                    }
-                                else
-                                    {
-                                        console.log(courseID+" Sucessfully inserted")
-                                        inserted += 1;        
-                                    }
-
-                        
-                                console.log(inserted+errors.length==coursesID.length);
-                                if (inserted+errors.length == coursesID.length)
-                                    {
-                                        if (errors.length>0)
-                                            {
-                                                console.log(errors+" was the cause for issue")
-                                                return res.status(500).send({error:errors})
-                                            }
-                                        else
-                                            {
-                                                console.log("Everything worked out just fine and cart was created")
-                                                return res.sendStatus(200)   
-                                            }
-                                    } 
-                            })
+                                console.log(`Error creating item`)
+                                errors.push("err");
+                            }
+                        else if (createdCart)
+                            {
+                                console.log(courseID+" Sucessfully inserted")
+                                inserted += 1;        
+                            }
                     }
-
+                console.log(inserted+errors.length==coursesID.length);       
+                if (errors.length>0)
+                    {
+                        console.log(errors+" was the cause for issue")
+                        return res.status(500).send({error:errors})
+                    }
+                else
+                    {
+                        console.log("Everything worked out just fine and cart was created")
+                        return res.sendStatus(200)   
+                    }
             }   
         catch(e)
             {
@@ -756,7 +755,7 @@ router.post('/cart/:orderNum',function(req,res)
     })
 
 
-router.post('/getCart/:orderNum',function(req,res)
+router.post('/getCart/:orderNum',async function(req,res)
     {
         const {orderNum} = req.params
         const {token} = req.body
@@ -775,20 +774,18 @@ router.post('/getCart/:orderNum',function(req,res)
             {
                 //let result = "result of parsing"//Fetch orderNum
                 console.log("getting cart with user_id and order_num now.")
-                db.all("SELECT * FROM cart WHERE user_id = ? AND order_num = ?",[user_id,orderNum],function(err,row)
-                {
-                    if(err)
-                        {
-                            console.log(err)
-                            return res.sendStatus(500)
-                        }
-                    else
-                        {
-                            console.log("Everything worked out amazing")
-                            res.status(200).send(row)
-                            return
-                        }
-                })
+                const item = await Cart.find({user_id:id,order_num:orderNum})
+                if(!item)
+                    {
+                        console.log("couldnt find anything")
+                        return res.sendStatus(500)
+                    }
+                else if(item)
+                    {
+                        console.log("Everything worked out amazing")
+                        res.status(200).send(queryStmt)
+                        return
+                    }
             }
         catch(e)
             {
@@ -799,9 +796,9 @@ router.post('/getCart/:orderNum',function(req,res)
     })
 
 
-router.put('/cart/:orderNum',function(req,res)
+router.put('/cart/:orderNum/courseID',async function(req,res)
     {
-        const {orderNum} = req.params
+        const {orderNum,courseID} = req.params
         const {token,changes} = req.body
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
@@ -816,42 +813,24 @@ router.put('/cart/:orderNum',function(req,res)
       
 
         try
-            {   let errors = []
-                let updated = 0
-                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
-                console.log("Editiing cart now")
-                for (let i=0;i<=Object.keys(changes).length-1;i++)
+            {   
+                console.log("Editing cart now with changes:" + JSON.stringify(changes))
+                const updatedCart = await Cart.updateOne({order_num:orderNum,course_id:courseID},changes)
+                
+                if(!updatedCart)
                     {
-                        console.log(i)
-                        db.run(`UPDATE cart SET ${Object.keys(changes)[i]}= ? WHERE user_id = ? and order_num= ?`,[Object.values(changes)[i],id,orderNum],function(err)
-                            { 
-                                if(err)
-                                    {
-                                        console.log(err)
-                                        errors.push(err)
-                                    }
-                                else
-                                    {
-                                        console.log("Updated: ", updated)
-                                        updated += 1;
-                                    }
-                            })
-                            
+                        console.log("Updated didn't go through")
+                         res.status(503).send({error:"errorloging changes"})
+                         return;
+
                     }
-                console.log(`Updated: ${updated}:Errors ${errors.length}`)
-                if (updated+errors.length==Object.keys(changes).length-1)
+                else if (updatedCart)
                     {
-                        if (errors.length>0)
-                            {
-                                console.log(errors)
-                                return res.status(500).send({errors:errors})
-                            }
-                        else
-                        {
-                            console.log("Successful in changing cart")
-                            return res.sendStatus(200)
-                        }
-                    } 
+                        console.log("Cart should be updated");
+                        res.sendStatus(200)
+                        return;
+
+                    }
 
             }   
         catch(e)
@@ -862,7 +841,7 @@ router.put('/cart/:orderNum',function(req,res)
     })
 
 
-router.delete('/cart/:orderNum',function(req,res)
+router.delete('/cart/:orderNum',async function(req,res)
     {
         const {orderNum} = req.params
         const {token} = req.body
@@ -879,23 +858,24 @@ router.delete('/cart/:orderNum',function(req,res)
         try
             {
                 console.log("Starting deletion of cart")
-                db.run('DELETE FROM cart WHERE user_id = ? AND order_num= ?',[id,orderNum],function(err)
+                const deletedCart = await Cart.deleteMany({order_num:orderNum})
                     {
-                        if(err)
+                        if(!deletedCart)
                             {
                                 console.log(err)
                                 //sends a json of the issue and a 500 status
                                 res.status(500).send({error:err})
                                 return
                             }
-                        else
+                        else if (deletedCart)
                             {
                                 console.log("sucessfully done")
                                 res.send(200)
                                 return
                             }
-                    })
-            }
+                    
+                    }
+                }
     catch(e)
         {
             console.log(e)
@@ -905,7 +885,7 @@ router.delete('/cart/:orderNum',function(req,res)
 })
  
 //Enrollment
-router.post("/enroll",function(req,res)
+router.post("/enroll",async function(req,res)
 // needs body params of {"user_id":"user_id_goes_here", "courseID":"courseID_goes_here"}
     {
         try
@@ -923,8 +903,8 @@ router.post("/enroll",function(req,res)
                     }
                 if(!id|| !courseID){res.status(500).send({"Error":"Missing user_ID / courseID"});return}
                 console.log("enrolling user now!")
-                db.run("INSERT into enrollment(user_id,course_id) values (?,?)",[id,courseID],function(err)
-                    {
+                const enroll = await Enrollment.insertOne({user_id:id,course_id:courseID})
+                    
                         if(err)
                             {
                                 console.log(err)
@@ -937,7 +917,7 @@ router.post("/enroll",function(req,res)
                                 res.status(200).send({"Status":"Success"})
                                 return
                             }
-                    })
+                    
             }
         catch(err)
             {
@@ -949,7 +929,7 @@ router.post("/enroll",function(req,res)
 
 
 
-router.post("/checkEnroll",function(req,res)
+router.post("/checkEnroll",async function(req,res)
 // Needs a body param of 
 //    {user_id:"user_id_goes_here"}
     {
@@ -966,27 +946,27 @@ router.post("/checkEnroll",function(req,res)
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
-                console.log("ID: "+id)
-                if(!id){res.status(500).send({"Error":"Missing ID ,cant do anything with no id"})}
-                db.all("SELECT * from enrollment WHERE user_id = ?",[id],function(err,row)
+                console.log("checking enrollment now")
+                const enrolled= await Enrollment.find({user_id:id})
+                    
+                if(!enrolled)
                     {
-                        if(err)
-                            {
-                                console.log(err)
-                                res.status(500).send(err);return
-                            } 
-                        else if(row)
-                            {
-                                console.log("Found classes that user is enrolled in")
-                                res.status(200).send(row)
-                                return
-                            }
-                        else
-                            {
-                                res.status(404).send("Nothing to see here")
-                                return
-                            }
-                    })
+                        console.log(err)
+                        res.status(500).send(err);
+                        return
+                    } 
+                else if(enrolled)
+                    {
+                        console.log("Found classes that user is enrolled in")
+                        res.status(200).send(enrolled)
+                        return
+                    }
+                else
+                    {
+                        res.status(404).send("Nothing to see here")
+                        return
+                    }
+                    
             }
         catch(err)
             {
@@ -998,11 +978,13 @@ router.post("/checkEnroll",function(req,res)
     })
 
 
-router.put("/enroll",function(req,res)
+router.put("/enroll/:courseID",async function(req,res)
     {
         {
         //Any changes goes in the req.body
+        const {courseID} = req.params
         const {token,changes} = req.body
+        console.log("Changes:" +changes)
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -1013,44 +995,26 @@ router.put("/enroll",function(req,res)
                         res.status(503).send({error:"Missing id/email/password/role"})
                         return
                     }
-        
-        try
-            {   let errors = []
-                let updated = 0
-                console.log(`${Object.keys(changes)[0]}:${Object.values(changes)[0]}`)
-                console.log("Changing enroll now")
-                for (let i=0;i<=Object.keys(changes).length-1;i++)
+
+                console.log("begining update")
+                try
+            { 
+                const updateEnroll = await Enrollment.updateOne({user_id:id,course_id:courseID},changes)
+                if(!updateEnroll)
                     {
-                        console.log(i)
-                        db.run(`UPDATE enrollment SET ${Object.keys(changes)[i]}= ? WHERE user_id = ?`,[Object.values(changes)[i],user_id],function(err)
-                            { 
-                                if(err)
-                                    {
-                                        console.log(err)
-                                        errors.push(err)
-                                    }
-                                else
-                                    {
-                                        console.log("updated", updated)
-                                        updated += 1;
-                                    }
-                            })
-                            
+                        console.log("couldn't update")
+                        res.status(500).send({error:"Update didnt go through"})
+                        return;
                     }
-                console.log(`Updated: ${updated}:Errors ${errors.length}`)
-                if (updated+errors.length==Object.keys(changes).length-1)
+                else if (updateEnroll)
                     {
-                        if (errors.length>0)
-                            {
-                                console.log("Change of enrollment failed")
-                                return res.status(500).send({errors:errors})
-                            }
-                        else
-                        {
-                            console.log("Change of enrollment worked")
-                            return res.sendStatus(200)
-                        }
-                    } 
+                        console.log("Updated course"+courseID)
+                        res.sendStatus(200)
+                        return;
+
+                    }
+        
+          
             }   
         catch(e)
             {
@@ -1062,7 +1026,7 @@ router.put("/enroll",function(req,res)
 
     
 //Dont use yet
-router.delete("/enroll",function(req,res)
+router.delete("/enroll",async function(req,res)
     {
         try
             {
@@ -1080,22 +1044,22 @@ router.delete("/enroll",function(req,res)
                 //Make sure to send as course_id
 
                 console.log(`deleting ${id}: from Course_id${course_id}`)
-                db.run("DELETE FROM enrollment WHERE user_id = ? AND course_id= ?",[id,course_id],function(err)
+                const deleteEnroll = await Enrollment.deleteOne({user_id:id,course_id:course_id})
                     {
-                        if(err)
+                        if(!deleteEnroll)
                             {
-                                console.log(err)
-                                res.status(500).send(err)
+                                console.log("couldnt delete")
+                                res.status(500).send({error:"Couldnt delete"})
                                 return
                             }
-                        else
+                        else if (deleteEnroll)
                             {
                                 console.log("enrollment was deleted")
                                 res.sendStatus(200)
                                 return
-
                             }
-                    })
+                        }
+                    
             }
         catch(err)
             {

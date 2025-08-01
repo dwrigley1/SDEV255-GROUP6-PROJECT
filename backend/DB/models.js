@@ -49,6 +49,5 @@ module.exports ={
   User: mongoose.model("User",userSchema),
   Course: mongoose.model("Course",courseSchema),
   Cart: mongoose.model("Cart", cartSchema),
-
   Enrollment: mongoose.model("Enrollment",enrollmentSchema)
 };
