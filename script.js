@@ -2,18 +2,16 @@ if (typeof CryptoJS === "undefined") {
   alert("CryptoJS failure."); // debugging
 }
 
-let role = "student"; // default fallback, doesn't seem to be working..
+let role = "student"; // default fallback
 let creatorId = null;
 
 window.onload = async function () {
   const token = localStorage.getItem("token");
 
-// changing frontend to match backend
-
   if (!token) {
     console.warn("No token found");
-    //window.location.href = "login.html"; // commented out, possible infinite loop
-   // return;
+    // window.location.href = "login.html";
+    // return; // commented out due to possible infinite loop
   }
 
   try {
@@ -24,10 +22,10 @@ window.onload = async function () {
     console.error("Token decryption failed", err);
     alert("Your session is invalid. Please log in again.");
     localStorage.removeItem("token");
-    //if (!window.location.href.includes("login.html")) {
-      //window.location.href = "login.html";
-    }
-    //return;
+    // if (!window.location.href.includes("login.html")) {
+    //   window.location.href = "login.html"; // commented out due to possible infinite loop
+    // }
+    return;
   }
 
   if (role === "teacher") {
@@ -43,11 +41,11 @@ window.onload = async function () {
           subject: document.getElementById("subject").value,
           credits: document.getElementById("credits").value,
           description: document.getElementById("description").value,
-          token:token.toString()
+          token: token.toString()
         };
-        console.log(course)
-        try { 
-            const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
+        console.log(course);
+        try {
+          const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(course),
@@ -65,7 +63,9 @@ window.onload = async function () {
           console.error("Fetch crashed:", err);
         }
       });
-    }else if (!form){console.log("not finding form")}
+    } else {
+      console.log("not finding form");
+    }
   } else {
     showStudentUI();
   }
@@ -78,7 +78,7 @@ window.onload = async function () {
     const card = renderCourseCard(course, role);
     courseSection.appendChild(card);
   });
-//};
+}; 
 
 function parseToken(token) {
   console.log("parse token function triggered");
@@ -97,10 +97,14 @@ function addToCart(courseName) {
 
 function showTeacherUI() {
   document.getElementById("teacherControls").style.display = "block";
+  const cartLink = document.getElementById("shoppingCartLink");
+  if (cartLink) cartLink.style.display = "none"; // this hides the cart link from the teacher log in
 }
 
 function showStudentUI() {
-  document.getElementById("teacherControls").style.display = "none";
+  document.getElementById("teacherControls").style.display = "none"; 
+  const courseEditLink = document.getElementById("courseEditLink");
+  if (courseEditLink) courseEditLink.style.display = "none"; // this hides the course editing link from the student log in
 }
 
 function renderCourseCard(course, role) {
