@@ -39,7 +39,7 @@ async function deleteCourse() {
 
   if (!confirm("Are you sure you want to delete this course?")) return;
 
-  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}`, {
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${_id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json"
