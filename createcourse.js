@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // const user_id = sessionStorage.getItem("user_id"); // new const variable
-const token = localStorage.getItem("token"); // need to pass token for auth purposes
+const _id = localStorage.getItem("token"); // need to pass token for auth purposes
+const creator_id = creator_id
 
 
 
@@ -124,7 +125,7 @@ async function editCourse() {
     description: document.querySelector("#description").value
   };
 
-  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
