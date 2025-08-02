@@ -86,6 +86,42 @@ function showStudentUI() {
   if (teacherControls) teacherControls.style.display = "none";
 }
 
+  function renderCourseCard(course, role) {
+  const card = document.createElement("div");
+  card.className = "course-card";
+
+  const header = document.createElement("h4");
+  header.textContent = `${course.name} - ${course.credits} Credit Hours`;
+
+  const desc = document.createElement("p");
+  desc.textContent = course.description;
+
+  card.appendChild(header);
+  card.appendChild(desc);
+
+  // only students can add to cart
+  if (role === "student") {
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "Add to Cart";
+    addBtn.onclick = () => addToCart(course.name);
+    card.appendChild(addBtn);
+  }
+
+  // only teachers can edit
+  if (role === "teacher") {
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.onclick = () => {
+      window.location.href = `editcourse.html?id=${course._id}`; // pass course ID via query param
+    };
+    card.appendChild(editBtn);
+  }
+
+  return card;
+}
+
+
+/** 
 function renderCourseCard(course, role) {
   const card = document.createElement("div");
   card.className = "course-card";
@@ -119,7 +155,7 @@ function renderCourseCard(course, role) {
   }
 
   return card;
-}
+}**/
 
 
 async function deleteCourse(courseId) {
