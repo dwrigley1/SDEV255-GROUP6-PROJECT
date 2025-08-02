@@ -46,7 +46,7 @@ async function deleteCourse(){
         description: document.querySelector("#description").value,
         creator_id: user_id
     }
-    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${course.courseId}`,{
+    const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`,{
         method: "DELETE",
         headers:{
             "Content-Type" : "application/json"
