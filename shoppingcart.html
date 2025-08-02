@@ -16,7 +16,7 @@
   <div class="main">
     <h1>Shopping Cart</h1>
     <ul id="cart-list"></ul>
-    <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
+    
   </div>
 
   <script>
@@ -35,7 +35,7 @@
           li.textContent = course + ' ';
 
           const removeBtn = document.createElement('button');
-          removeBtn.classList.add('remove-btn');
+          //removeBtn.classList.add('remove-btn');
           removeBtn.textContent = 'Remove';
           removeBtn.onclick = () => removeCourse(index);
           li.appendChild(removeBtn);
@@ -50,10 +50,10 @@
       localStorage.setItem('cart', JSON.stringify(cart));
       loadCart();
     }
-
+  <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
     function confirmSchedule() {
       alert('Schedule Confirmed!');
-      localStorage.removeItem("cart"); // clears the cart after submission
+      loadCart();
     }
 
     loadCart();
