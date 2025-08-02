@@ -1,41 +1,52 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const courseId = urlParams.get("id");
-
-  if (!courseId) {
-    document.getElementById("error").textContent = "Missing course ID.";
-    return;
-  }
-
-  document.getElementById("courseId").value = courseId;
-  loadCourse(courseId);
-
-  document.getElementById("updateBtn").addEventListener("click", () => updateCourse(courseId));
+  loadCourses();
+  document.getElementById("courseSelect").addEventListener("change", populateForm);
+  document.getElementById("updateBtn").addEventListener("click", updateCourse);
 });
 
-async function loadCourse(id) {
+let courseList = [];
+
+async function loadCourses() {
+  const select = document.getElementById("courseSelect");
+  select.innerHTML = `<option value="">Select a course</option>`;
+
   try {
     const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/");
-    const courses = await response.json();
-    const course = courses.find(c => c._id === id);
+    courseList = await response.json();
 
-    if (!course) {
-      document.getElementById("error").textContent = "Course not found.";
-      return;
-    }
-
-    document.getElementById("name").value = course.name;
-    document.getElementById("subject").value = course.subject;
-    document.getElementById("credits").value = course.credits;
-    document.getElementById("description").value = course.description;
+    courseList.forEach(course => {
+      const option = document.createElement("option");
+      option.value = course._id;
+      option.textContent = course.name;
+      select.appendChild(option);
+    });
   } catch (err) {
-    console.error("Error loading course:", err);
-    document.getElementById("error").textContent = "Error loading course.";
+    console.error("Failed to load courses:", err);
+    select.innerHTML = `<option value="">Error loading courses</option>`;
   }
 }
 
-async function updateCourse(courseId) {
+function populateForm() {
+  const courseId = document.getElementById("courseSelect").value;
+  const selected = courseList.find(c => c._id === courseId);
+
+  if (!selected) return;
+
+  document.getElementById("courseId").value = selected._id;
+  document.getElementById("name").value = selected.name;
+  document.getElementById("subject").value = selected.subject;
+  document.getElementById("credits").value = selected.credits;
+  document.getElementById("description").value = selected.description;
+}
+
+async function updateCourse() {
+  const courseId = document.getElementById("courseId").value;
   const token = localStorage.getItem("token");
+
+  if (!courseId || !token) {
+    document.getElementById("error").textContent = "Missing token or course ID.";
+    return;
+  }
 
   const courseChanges = {
     name: document.getElementById("name").value,
@@ -52,15 +63,14 @@ async function updateCourse(courseId) {
     });
 
     if (response.ok) {
-      alert("Course updated!");
-      window.location.href = "index.html";
+      alert("Course updated successfully!");
     } else {
-      const error = await response.text();
-      console.error("Update failed:", error);
+      const errorText = await response.text();
+      console.error("Update failed:", errorText);
       document.getElementById("error").textContent = "Failed to update course.";
     }
   } catch (err) {
-    console.error("Update error:", err);
+    console.error("Error updating course:", err);
     document.getElementById("error").textContent = "Error updating course.";
   }
 }
