@@ -15,18 +15,13 @@
 <body>
   <div class="topnav">
     <a href="index.html"> All Courses </a>
-    <a href="createcourse.html">Edit Courses</a>
     <a href="contact.html">Contact Us</a>
+    <a href="login.html">Logout</a>
   </div>
 
   <div class="main">
     <h1>Add New Course</h1>
     <form>
-      <!--
-      <label for="courseId">Course ID (for Edit/Delete)</label>
-      <input type="text" id="courseId" placeholder="mongodb+srv://sdev255:password255@255appdb.jlucgds.mongodb.net/?retryWrites=true&w=majority&appName=255AppDB" />
-    -->
-
       <label for="name">Course Name</label>
       <input type="text" id="name" required>
 
@@ -41,10 +36,7 @@
 
       <div class="button-group">
         <button type="button" id="addBtn">Add Course</button>
-        <button type="button" id="deleteBtn">Delete Course</button>
-        <button type="button" id="editBtn">Edit Course</button>
       </div>
-
       <div id="error"></div>
     </form>
   </div>

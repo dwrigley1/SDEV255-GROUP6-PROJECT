@@ -8,7 +8,6 @@ let creatorId = null;
 window.onload = async function () {
   const token = localStorage.getItem("token");
   
-
   if (!token) {
     console.warn("No token found");
     return;
@@ -119,44 +118,6 @@ function showStudentUI() {
 
   return card;
 }
-
-
-/** 
-function renderCourseCard(course, role) {
-  const card = document.createElement("div");
-  card.className = "course-card";
-
-  const header = document.createElement("h4");
-  header.textContent = `${course.name} - ${course.credits} Credit Hours`; 
-
-  const desc = document.createElement("p");
-  desc.textContent = course.description;
-
-  card.appendChild(header);
-  card.appendChild(desc);
-
-  if (role === "student") {
-    const btn = document.createElement("button");
-    btn.textContent = "Add to Cart";
-    btn.onclick = () => addToCart(course.name); // course.name
-    card.appendChild(btn);
-  } else if (role === "teacher") {
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    
-    // edit courses...???
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Delete";
-    delBtn.onclick = () => deleteCourse(course._id); // _id for deletion
-
-    card.appendChild(editBtn);
-    card.appendChild(delBtn);
-  }
-
-  return card;
-}**/
-
 
 async function deleteCourse(courseId) {
   const token = localStorage.getItem("token");
