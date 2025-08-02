@@ -2,7 +2,6 @@ if (typeof CryptoJS === "undefined") {
   alert("CryptoJS failed to load."); // debugging
 }
 
-console.log(user.id)
 console.log(token)
 
 var role; // global var due to redeclaration issues
