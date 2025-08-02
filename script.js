@@ -95,18 +95,12 @@ function renderCourseCard(course, role) {
   card.className = "course-card";
 
   const header = document.createElement("h4");
-  header.textContent = `${course.name} - ${course.credits} Credit Hours`; // ✅ Use `name`, not `id` or `subject`
-
-  const prereqElem = document.createElement("div");
-  if (course.prerequisites) {
-    prereqElem.innerHTML = `<h4>Prerequisites - ${course.prerequisites}</h4>`;
-  }
+  header.textContent = `${course.name} - ${course.credits} Credit Hours`; 
 
   const desc = document.createElement("p");
   desc.textContent = course.description;
 
   card.appendChild(header);
-  card.appendChild(prereqElem);
   card.appendChild(desc);
 
   if (role === "student") {
