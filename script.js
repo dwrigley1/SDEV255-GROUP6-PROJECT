@@ -20,10 +20,10 @@ window.onload = async function () {
     creatorId = user.id;
     console.log("Logged in as a ", role); // debugging
 
-    if (role === "teacher") { // redirects teacher users to createcourse.html 
-      window.location.href = "createcourse.html";
-      return;
-    }
+    //if (role === "teacher") { // redirects teacher users to createcourse.html 
+      //window.location.href = "createcourse.html";
+      //return;
+    //}
   } catch (err) {
     console.error("Token decryption failed:", err);
     alert("Invalid session. Please log in again.");
