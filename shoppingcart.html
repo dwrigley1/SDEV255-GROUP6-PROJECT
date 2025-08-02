@@ -57,7 +57,35 @@
     loadCart(); 
   }
 
+  async function loadEnrolledCourses() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch("https://sdev255-group6-project.onrender.com/api/coursesList", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ token })
+    });
+
+    const courses = await response.json();
+
+    const enrolledList = document.createElement("ul");
+    courses.forEach(course => {
+      const li = document.createElement("li");
+      li.textContent = `${course.name} - ${course.credits} credits`;
+      enrolledList.appendChild(li);
+    });
+
+    document.querySelector(".main").appendChild(enrolledList);
+  } catch (err) {
+    console.error("Could not fetch enrolled courses", err);
+  }
+}
   loadCart();
+  loadEnrolledCourses();
+
 </script>
 
 
