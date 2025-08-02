@@ -53,6 +53,7 @@
 
     function confirmSchedule() {
       alert('Schedule Confirmed!');
+      localStorage.removeItem("cart"); // clears the cart after submission
     }
 
     loadCart();
