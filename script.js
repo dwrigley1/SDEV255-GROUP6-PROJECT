@@ -7,6 +7,7 @@ let creatorId = null;
 
 window.onload = async function () {
   const token = localStorage.getItem("token");
+  console.log("Logged in as a ", role); // debugging
 
   if (!token) {
     console.warn("No token found");
@@ -93,7 +94,7 @@ function renderCourseCard(course, role) {
   card.className = "course-card";
 
   const header = document.createElement("h4");
-  header.textContent = `${course.id} - ${course.subject} - ${course.credits} Credit Hours`;
+  header.textContent = `${course.name} - ${course.credits} Credit Hours`; // ✅ Use `name`, not `id` or `subject`
 
   const prereqElem = document.createElement("div");
   if (course.prerequisites) {
@@ -110,15 +111,17 @@ function renderCourseCard(course, role) {
   if (role === "student") {
     const btn = document.createElement("button");
     btn.textContent = "Add to Cart";
-    btn.onclick = () => addToCart(`${course.id} - ${course.subject}`);
+    btn.onclick = () => addToCart(course.name); // course.name
     card.appendChild(btn);
   } else if (role === "teacher") {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     
+    // edit courses...???
+
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
-    delBtn.onclick = () => deleteCourse(course.id);
+    delBtn.onclick = () => deleteCourse(course._id); // _id for deletion
 
     card.appendChild(editBtn);
     card.appendChild(delBtn);
@@ -126,6 +129,7 @@ function renderCourseCard(course, role) {
 
   return card;
 }
+
 
 async function deleteCourse(courseId) {
   const token = localStorage.getItem("token");
