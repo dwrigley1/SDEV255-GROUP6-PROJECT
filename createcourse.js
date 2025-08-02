@@ -4,14 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#editBtn").addEventListener("click", editCourse);
 });
 
-// const user_id = sessionStorage.getItem("user_id"); // new const variable
-const _id = localStorage.getItem("token"); // need to pass token for auth purposes
-//const creator_id = creator_id
-
-
 
 // add a course //
 async function addCourse(){
+    const token = localStorage.getItem("token"); // need to pass token for auth purposes
     const course = {
         name: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
@@ -25,7 +21,7 @@ async function addCourse(){
         headers: {
             "Content-Type" : "application/json"
         },
-        body: JSON.stringify(token, course)
+        body: JSON.stringify(course)
     });
 
     if (response.ok) {
@@ -37,13 +33,13 @@ async function addCourse(){
 }
 
 // Delete a course by ID
-// ${courseId}
 async function deleteCourse() {
-  const courseId = document.querySelector("#courseId").value;
+    const token = localStorage.getItem("token"); // need to pass token for auth purposes
+    //const _id = document.querySelector("#courseId").value;
 
   if (!confirm("Are you sure you want to delete this course?")) return;
 
-  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${_id}`, {
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json"
@@ -61,9 +57,8 @@ async function deleteCourse() {
 
 // Edit a course by ID
 async function editCourse() {
-  const courseId = document.querySelector("#courseId").value;
-  //const courseId = _id
-
+  const _id = document.querySelector("#courseId").value;
+  
   const courseChanges = {
     name: document.querySelector("#name").value,
     subject: document.querySelector("#subject").value,
