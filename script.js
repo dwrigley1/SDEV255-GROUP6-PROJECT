@@ -1,8 +1,8 @@
 if (typeof CryptoJS === "undefined") {
-  alert("CryptoJS failure."); // debugging -> triggering as of 8/1 9pm
+  alert("CryptoJS failed to load."); // debugging
 }
 
-//var role = "student"; // default fallback
+var role; // global var due to redeclaration issues
 let creatorId = null;
 
 window.onload = async function () {
@@ -10,98 +10,54 @@ window.onload = async function () {
 
   if (!token) {
     console.warn("No token found");
-    // window.location.href = "login.html";
-    // return; // commented out due to possible infinite loop
+    return;
   }
 
   try {
     const user = parseToken(token);
     role = user.role;
     creatorId = user.id;
+
+    if (role === "teacher") { // redirects teacher users to createcourse.html 
+      window.location.href = "createcourse.html";
+      return;
+    }
   } catch (err) {
-    console.error("Token decryption failed", err);
-    alert("Your session is invalid. Please log in again."); // alert showing
+    console.error("Token decryption failed:", err);
+    alert("Invalid session. Please log in again.");
     localStorage.removeItem("token");
-    // if (!window.location.href.includes("login.html")) {
-    //   window.location.href = "login.html"; // commented out due to possible infinite loop
-    // }
     return;
   }
 
+  // load specific UI based on role
   if (role === "teacher") {
     showTeacherUI();
-
-    const form = document.getElementById("createCourseForm");
-    if (form) {
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const course = {
-          name: document.getElementById("name").value,
-          subject: document.getElementById("subject").value,
-          credits: document.getElementById("credits").value,
-          description: document.getElementById("description").value,
-          token: token.toString()
-        };
-        console.log(course);
-        try {
-          const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(course),
-          });
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`POST failed: ${response.status}`, errorText);
-            return;
-          }
-
-          console.log("Course successfully created");
-          location.reload();
-        } catch (err) {
-          console.error("Fetch crashed:", err);
-        }
-      });
-    } else {
-      console.log("not finding form");
-    }
   } else {
     showStudentUI();
   }
 
+  // Load courses
   const courseSection = document.getElementById("courseSection");
-  const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/");
-  const courses = await response.json();
+  try {
+    const response = await fetch("https://sdev255-group6-project.onrender.com/api/courses/");
+    const courses = await response.json();
 
-  courses.forEach(course => {
-    const card = renderCourseCard(course, role);
-    courseSection.appendChild(card);
-  });
-}; 
-
-
-function parseToken(token) {
-  if (!token) {
-    throw new Error("No token to decrypt");
+    courses.forEach(course => {
+      const card = renderCourseCard(course, role);
+      courseSection.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Error loading courses:", err);
   }
-  console.log("parse token function triggered");
-  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
-  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
-  return obj;
-}
+};
 
-
-/** 
 function parseToken(token) {
-  console.log("parse token function triggered");
+  if (!token) throw new Error("Missing token");
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
   return obj;
 }
-  **/
 
 function addToCart(courseName) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -111,15 +67,25 @@ function addToCart(courseName) {
 }
 
 function showTeacherUI() {
-  document.getElementById("teacherControls").style.display = "block";
   const cartLink = document.getElementById("shoppingCartLink");
-  if (cartLink) cartLink.style.display = "none"; // this hides the cart link from the teacher log in
+  if (cartLink) cartLink.style.display = "none";
+
+  const editLink = document.getElementById("courseEditLink");
+  if (editLink) editLink.style.display = "inline";
+
+  const teacherControls = document.getElementById("teacherControls");
+  if (teacherControls) teacherControls.style.display = "block";
 }
 
 function showStudentUI() {
-  document.getElementById("teacherControls").style.display = "none"; 
-  const courseEditLink = document.getElementById("courseEditLink");
-  if (courseEditLink) courseEditLink.style.display = "none"; // this hides the course editing link from the student log in
+  const cartLink = document.getElementById("shoppingCartLink");
+  if (cartLink) cartLink.style.display = "inline";
+
+  const editLink = document.getElementById("courseEditLink");
+  if (editLink) editLink.style.display = "none";
+
+  const teacherControls = document.getElementById("teacherControls");
+  if (teacherControls) teacherControls.style.display = "none";
 }
 
 function renderCourseCard(course, role) {
@@ -149,7 +115,7 @@ function renderCourseCard(course, role) {
   } else if (role === "teacher") {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
-
+    
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.onclick = () => deleteCourse(course.id);
@@ -164,8 +130,13 @@ function renderCourseCard(course, role) {
 async function deleteCourse(courseId) {
   const token = localStorage.getItem("token");
   if (!confirm("Delete course?")) return;
-  await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}/${courseId}`, {
-    method: "DELETE"
-  });
-  location.reload();
+
+  try {
+    await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${token}/${courseId}`, {
+      method: "DELETE"
+    });
+    location.reload();
+  } catch (err) {
+    console.error("Failed to delete course:", err);
+  }
 }

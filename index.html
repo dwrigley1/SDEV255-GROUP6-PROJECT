@@ -1,93 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Class Scheduler</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="topnav">
-    <a id="shoppingCartLink" href="shoppingcart.html">Shopping Cart</a> <!-- added an ID to this to call it later, hide from teachers -->
-    <a id="courseEditLink" href="createcourse.html">Edit Courses</a> <!-- added an ID to call it later, hide from students -->
+    <a id="shoppingCartLink" href="shoppingcart.html">Shopping Cart</a>
+    <a id="courseEditLink" href="createcourse.html">Edit Courses</a>
     <a href="contact.html">Contact Us</a>
   </div>
 
-    <h1 style="text-align: center;">Courses Offered</h1>
-    <div class="course-section">
-      <div class="course-card">
-        <h4>ENGL 111 - English Composition - 3 Credit Hours</h4>
-        <p>Develops skills in writing, reading, critical thinking, and research with emphasis on academic writing forms.</p>
-        <button onclick="addToCart('ENGL 111 - English Composition')">Add to Cart</button>
-      </div>
+  <h1 style="text-align: center;">Courses Offered</h1>
+  <div id="courseSection" class="course-section"></div>
 
-      <div class="course-card">
-        <h4>ENGL 202 - Creative Writing - 3 Credit Hours</h4>
-        <h4>Prerequisites - ENGL 111</h4>
-        <p>Introduces opportunities for self-expression through fiction, poetry, drama, and creative nonfiction.</p>
-        <button onclick="addToCart('ENGL 202 - Creative Writing')">Add to Cart</button>
-      </div>
-
-      <div class="course-card">
-        <h4>MATH 221 - Calculus for Technology I - 3 Credit Hours</h4>
-        <p>Covers limits, continuity, derivatives, integrals, and their applications in technology.</p>
-        <button onclick="addToCart('MATH 221 - Calculus for Technology I')">Add to Cart</button>
-      </div>
-
-      <div class="course-card">
-        <h4>MATH 222 - Calculus for Technology II - 3 Credit Hours</h4>
-        <h4>Prerequisites - MATH 221</h4>
-        <p>Covers transcendental functions, integration techniques, differential equations, and infinite series.</p>
-        <button onclick="addToCart('MATH 222 - Calculus for Technology II')">Add to Cart</button>
-      </div>
-
-      <div class="course-card">
-        <h4>BIOL 121 - General Biology I - 3 Credit Hours</h4>
-        <p>Introduces cell structure, photosynthesis, genetics, and biotechnology in prokaryotes and eukaryotes.</p>
-        <button onclick="addToCart('BIOL 121 - General Biology I')">Add to Cart</button>
-      </div>
-
-      <div class="course-card">
-        <h4>BIOL 122 - General Biology II - 3 Credit Hours</h4>
-        <h4>Prerequisites - BIOL 121</h4>
-        <p>Explores evolution, plant and animal function, anatomy, physiology, behavior, and ecology.</p>
-        <button onclick="addToCart('BIOL 122 - General Biology II')">Add to Cart</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function addToCart(courseName) {
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.push(courseName);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      alert(courseName + ' added to cart!');
-    }
-  </script>
-
-
-<!-- This <script> hides shoppingcart.html from the teachers
-  & hides createcourse.html from students 
-  <script>
-  const role = sessionStorage.getItem("user_role");
-  if (role === "teacher") {
-    const cartLink = document.querySelector('a[href="shoppingcart.html"]');
-    if (cartLink) cartLink.style.display = "none";
-  }
-  if (role === "student") {
-    // Hide teacher-only pages
-    const createLink = document.querySelector('a[href="createcourse.html"]');
-    if (createLink) createLink.style.display = "none";
-  }
-</script>-->
-
+  <!-- Needed for teacher-specific display toggle -->
+  <div id="teacherControls" style="display: none;"></div>
 
   <footer class="footer">
     &copy; 2025 Group 6 Class Scheduler
   </footer>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <!-- need to load CryptoJS first -->
+
+  <!-- CryptoJS FIRST -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  
   <script src="script.js"></script>
 </body>
 </html>
