@@ -438,8 +438,9 @@ router.delete('/login',async function(req,res)
 
 router.post('/courses',async function(req,res)
     {
+        //This creates courses
         const {token}= req.body;
-        console.log(token)
+        console.log("Token: "+token+" creating course")
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
                 const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
                 console.log("Decrypted Token:", decryptedToken);
@@ -452,7 +453,6 @@ router.post('/courses',async function(req,res)
                         return
                     }
         console.log(id,email+"Are present in token")
-        //const queryStmt = db.prepare(`SELECT u.id FROM users as u WHERE u.id= ? AND u.role = teacher `)
         const {name, description, subject, credits} = req.body
         if(!name || !description ||!subject || !credits){res.status(500).send({"error":"Missing name/description/subject/credits"});return;}
         try
@@ -504,8 +504,8 @@ router.get('/courses/',async function(req,res)
         
         try
             { 
+                //This retreives all courses
                 console.log("Starting /courses")
-                //login function checking db
                 const queryStmt= await Course.find({})
                     
                         console.log("Searched through potential courses")
@@ -547,6 +547,7 @@ router.get('/courses/',async function(req,res)
 
 router.post('/coursesList/',async function(req,res)
     {
+        //This gets all courses that a user is enrolled in
         const {token}= req.body;
         console.log(token+ " for coursesList")
         const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
@@ -613,7 +614,7 @@ router.post('/coursesList/',async function(req,res)
 
 
 
-router.put('/courses/:coursesID',function(req,res)
+router.put('/courses/:coursesID',async function(req,res)
     {
         
         //coursesID put in the url 
@@ -640,8 +641,7 @@ router.put('/courses/:coursesID',function(req,res)
             {
                 //update courses
                 console.log("changes are being made right now to  courses")
-                console.log(`Value: ${Object.values(courseChanges)[0]} \n ${coursesID}`)
-                const updatedCourse = Course.updateOne({_id:coursesID})
+                const updatedCourse = await Course.updateOne({_id:coursesID},courseChanges)
                         if (!updatedCourse)
                             {
                                 console.log("Couldn't update course")
@@ -706,7 +706,7 @@ router.get('/cart',async function(req,res)
 
         try
             {
-                //let result = "result of parsing"//Fetch orderNum
+                //gets all carts
                 console.log("getting cart with user_id and order_num now.")
                 const item = await Cart.find({})
                 if(!item)
