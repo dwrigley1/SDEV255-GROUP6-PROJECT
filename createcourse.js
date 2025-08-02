@@ -36,7 +36,7 @@ async function addCourse(){
     }
 }
 
-// delete a course //
+/**delete a course 
 async function deleteCourse(){
     const courseId = document.querySelector("#courseId").value;
     const course = {
@@ -89,4 +89,53 @@ async function editCourse(){
         document.querySelector("#error").innerHTML = "Cannot edit course"
     }
 }
+**/
 
+// Delete a course by ID
+async function deleteCourse() {
+  const courseId = document.querySelector("#courseId").value;
+
+  if (!confirm("Are you sure you want to delete this course?")) return;
+
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ token })
+  });
+
+  if (response.ok) {
+    alert("Course deleted successfully!");
+    document.querySelector("form").reset();
+  } else {
+    document.querySelector("#error").innerHTML = "Cannot delete course.";
+  }
+}
+
+// Edit a course by ID
+async function editCourse() {
+  const courseId = document.querySelector("#courseId").value;
+
+  const courseChanges = {
+    name: document.querySelector("#name").value,
+    subject: document.querySelector("#subject").value,
+    credits: document.querySelector("#credits").value,
+    description: document.querySelector("#description").value
+  };
+
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ token, courseChanges })
+  });
+
+  if (response.ok) {
+    alert("Course updated successfully!");
+    document.querySelector("form").reset();
+  } else {
+    document.querySelector("#error").innerHTML = "Cannot edit course.";
+  }
+}
