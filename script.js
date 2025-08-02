@@ -7,7 +7,7 @@ let creatorId = null;
 
 window.onload = async function () {
   const token = localStorage.getItem("token");
-  console.log("Logged in as a ", role); // debugging
+  
 
   if (!token) {
     console.warn("No token found");
@@ -18,6 +18,7 @@ window.onload = async function () {
     const user = parseToken(token);
     role = user.role;
     creatorId = user.id;
+    console.log("Logged in as a ", role); // debugging
 
     if (role === "teacher") { // redirects teacher users to createcourse.html 
       window.location.href = "createcourse.html";
