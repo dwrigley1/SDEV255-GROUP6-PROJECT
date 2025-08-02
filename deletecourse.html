@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delete Course</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="deletecourse.js" defer></script>
+</head>
+<body>
+  <div class="topnav">
+    <a href="index.html">All Courses</a>
+    <a href="createcourse.html">Create Course</a>
+    <a href="editcourse.html">Edit Course</a>
+    <a href="deletecourse.html">Delete Course</a>
+  </div>
+
+  <main>
+    <h1>Delete a Course</h1>
+
+    <label for="courseDropdown">Select a Course to Delete:</label>
+    <select id="courseDropdown">
+      <option value="">Loading...</option>
+    </select>
+
+    <button id="deleteBtn">Delete Selected Course</button>
+    <p id="error" style="color: red;"></p>
+  </main>
+</body>
+</html>

@@ -35,7 +35,6 @@ async function addCourse(){
 // Delete a course by ID
 async function deleteCourse() {
     const token = localStorage.getItem("token"); // need to pass token for auth purposes
-    //const _id = document.querySelector("#courseId").value;
 
   if (!confirm("Are you sure you want to delete this course?")) return;
 
