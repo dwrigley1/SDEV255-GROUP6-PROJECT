@@ -15,50 +15,51 @@
   </div>
 
   <div class="main">
-    <h1>Shopping Cart</h1>
-    <ul id="cart-list"></ul>
-    
-  </div>
-
-  <script>
-    function loadCart() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const cartList = document.getElementById('cart-list');
-      cartList.innerHTML = '';
-
-      if (cart.length === 0) {
-        const emptyMessage = document.createElement('p');
-        emptyMessage.textContent = 'Shopping Cart is Empty!';
-        cartList.appendChild(emptyMessage);
-      } else {
-        cart.forEach((course, index) => {
-          const li = document.createElement('li');
-          li.textContent = course + ' ';
-
-          const removeBtn = document.createElement('button');
-          //removeBtn.classList.add('remove-btn');
-          removeBtn.textContent = 'Remove';
-          removeBtn.onclick = () => removeCourse(index);
-          li.appendChild(removeBtn);
-          cartList.appendChild(li);
-        });
-      }
-    }
-
-    function removeCourse(index) {
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.splice(index, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      loadCart();
-    }
+  <h1>Shopping Cart</h1>
+  <ul id="cart-list"></ul>
   <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
-    function confirmSchedule() {
-      alert('Schedule Confirmed!');
-      loadCart();
-    }
+</div>
 
+<script>
+  function loadCart() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartList = document.getElementById('cart-list');
+    cartList.innerHTML = '';
+
+    if (cart.length === 0) {
+      const emptyMessage = document.createElement('p');
+      emptyMessage.textContent = 'Shopping Cart is Empty!';
+      cartList.appendChild(emptyMessage);
+    } else {
+      cart.forEach((course, index) => {
+        const li = document.createElement('li');
+        li.textContent = course + ' ';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => removeCourse(index);
+        li.appendChild(removeBtn);
+        cartList.appendChild(li);
+      });
+    }
+  }
+
+  function removeCourse(index) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
     loadCart();
-  </script>
+  }
+
+  function confirmSchedule() {
+    alert('Schedule Confirmed!');
+    localStorage.removeItem('cart'); // clears the cart
+    loadCart(); 
+  }
+
+  loadCart();
+</script>
+
 
   <footer class="footer">
     &copy; 2025 Group 6 Class Scheduler
