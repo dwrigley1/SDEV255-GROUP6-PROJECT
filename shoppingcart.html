@@ -20,10 +20,6 @@
   <button class="confirm-btn" onclick="confirmSchedule()">Confirm Schedule</button>
 </div>
 
-<div id="enrolled-list" class="main">
-  <!-- enrolled courses will be inserted here -->
-</div>
-
 <script>
   function loadCart() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -38,6 +34,7 @@
       cart.forEach((course, index) => {
         const li = document.createElement('li');
         li.textContent = course + ' ';
+
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
         removeBtn.onclick = () => removeCourse(index);
@@ -56,51 +53,13 @@
 
   function confirmSchedule() {
     alert('Schedule Confirmed!');
-    localStorage.removeItem('cart');
-    loadCart();
-    loadEnrolledCourses();
-  }
-
-  async function loadEnrolledCourses() {
-    const token = localStorage.getItem("token");
-    const enrolledList = document.getElementById("enrolled-list");
-
-    if (!token) return;
-
-    enrolledList.innerHTML = "<p>Loading enrolled courses...</p>";
-
-    try {
-      const response = await fetch("https://sdev255-group6-project.onrender.com/api/coursesList", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
-      });
-
-      const courses = await response.json();
-      enrolledList.innerHTML = "<h3>Enrolled Courses</h3>";
-
-      if (!Array.isArray(courses) || courses.length === 0) {
-        enrolledList.innerHTML += "<p>No enrolled courses.</p>";
-        return;
-      }
-
-      const ul = document.createElement("ul");
-      courses.forEach(course => {
-        const li = document.createElement("li");
-        li.textContent = `${course.name} (${course.credits} credits)`;
-        ul.appendChild(li);
-      });
-
-      enrolledList.appendChild(ul);
-    } catch (err) {
-      console.error("Could not load enrolled courses:", err);
-      enrolledList.innerHTML = "<p>Error loading enrolled courses.</p>";
-    }
+    localStorage.removeItem('cart'); // clears the cart
+    loadCart(); 
   }
 
   loadCart();
-  loadEnrolledCourses(); 
 </script>
+
 
   <footer class="footer">
     &copy; 2025 Group 6 Class Scheduler
