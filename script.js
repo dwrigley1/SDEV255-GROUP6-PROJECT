@@ -1,8 +1,8 @@
 if (typeof CryptoJS === "undefined") {
-  alert("CryptoJS failure."); // debugging
+  alert("CryptoJS failure."); // debugging -> triggering as of 8/1 9pm
 }
 
-let role = "student"; // default fallback
+//var role = "student"; // default fallback
 let creatorId = null;
 
 window.onload = async function () {
@@ -20,7 +20,7 @@ window.onload = async function () {
     creatorId = user.id;
   } catch (err) {
     console.error("Token decryption failed", err);
-    alert("Your session is invalid. Please log in again.");
+    alert("Your session is invalid. Please log in again."); // alert showing
     localStorage.removeItem("token");
     // if (!window.location.href.includes("login.html")) {
     //   window.location.href = "login.html"; // commented out due to possible infinite loop
