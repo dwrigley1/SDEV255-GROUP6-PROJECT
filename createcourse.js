@@ -62,6 +62,7 @@ async function deleteCourse() {
 // Edit a course by ID
 async function editCourse() {
   const courseId = document.querySelector("#courseId").value;
+  //const courseId = _id
 
   const courseChanges = {
     name: document.querySelector("#name").value,
