@@ -11,14 +11,13 @@ const _id = localStorage.getItem("token"); // need to pass token for auth purpos
 
 
 // add a course //
-// creator_id: user_id
 async function addCourse(){
     const course = {
         name: document.querySelector("#name").value,
         subject: document.querySelector("#subject").value,
         credits: document.querySelector("#credits").value,
         description: document.querySelector("#description").value,
-        token: ({token}).value
+        token
     }
 
     const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses`, {
@@ -26,7 +25,7 @@ async function addCourse(){
         headers: {
             "Content-Type" : "application/json"
         },
-        body: JSON.stringify(course)
+        body: JSON.stringify(token, course)
     });
 
     if (response.ok) {
@@ -38,12 +37,13 @@ async function addCourse(){
 }
 
 // Delete a course by ID
+// ${courseId}
 async function deleteCourse() {
   const courseId = document.querySelector("#courseId").value;
 
   if (!confirm("Are you sure you want to delete this course?")) return;
 
-  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${courseId}`, {
+  const response = await fetch(`https://sdev255-group6-project.onrender.com/api/courses/${_id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json"
