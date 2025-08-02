@@ -80,6 +80,20 @@ window.onload = async function () {
   });
 }; 
 
+
+function parseToken(token) {
+  if (!token) {
+    throw new Error("No token to decrypt");
+  }
+  console.log("parse token function triggered");
+  const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
+  return obj;
+}
+
+
+/** 
 function parseToken(token) {
   console.log("parse token function triggered");
   const bytes = CryptoJS.AES.decrypt(token, "dakota_hulk_fingus");
@@ -87,6 +101,7 @@ function parseToken(token) {
   const obj = Object.fromEntries(decrypted.split(",").map(p => p.split(":")));
   return obj;
 }
+  **/
 
 function addToCart(courseName) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];

@@ -9,14 +9,11 @@
 </head>
 
 <body>
-  <script src="script.js"></script>
-
   <div class="topnav">
     <a id="shoppingCartLink" href="shoppingcart.html">Shopping Cart</a> <!-- added an ID to this to call it later, hide from teachers -->
     <a id="courseEditLink" href="createcourse.html">Edit Courses</a> <!-- added an ID to call it later, hide from students -->
     <a href="contact.html">Contact Us</a>
   </div>
-
 
     <h1 style="text-align: center;">Courses Offered</h1>
     <div class="course-section">
@@ -72,7 +69,7 @@
 
 
 <!-- This <script> hides shoppingcart.html from the teachers
-  & hides createcourse.html from students -->
+  & hides createcourse.html from students 
   <script>
   const role = sessionStorage.getItem("user_role");
   if (role === "teacher") {
@@ -84,7 +81,7 @@
     const createLink = document.querySelector('a[href="createcourse.html"]');
     if (createLink) createLink.style.display = "none";
   }
-</script>
+</script>-->
 
 
   <footer class="footer">
