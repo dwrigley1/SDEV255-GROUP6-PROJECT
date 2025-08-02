@@ -699,13 +699,40 @@ router.put('/courses/:coursesID',function(req,res)
 
 
 
+router.get('/cart',async function(req,res)
+    {
+        
+        
 
+        try
+            {
+                //let result = "result of parsing"//Fetch orderNum
+                console.log("getting cart with user_id and order_num now.")
+                const item = await Cart.find({})
+                if(!item)
+                    {
+                        console.log("couldnt find anything")
+                        return res.sendStatus(500)
+                    }
+                else if(item)
+                    {
+                        console.log("Everything worked out amazing")
+                        res.status(200).send(queryStmt)
+                        return
+                    }
+            }
+        catch(e)
+            {
+                console.log(e)
+                res.sendStatus(404)
+                return
+            }
+    })
 
 
 //cart
-router.post('/cart/:orderNum',async function(req,res)
+router.post('/cart',async function(req,res)
     {
-        const {orderNum}= req.params
         //coursesID are assumed to be taken in as array stuctured as {coursesID:["1","2"]}
         const {token,coursesID} = req.body
         console.log("creating cart with order num: "+orderNum)
@@ -729,7 +756,7 @@ router.post('/cart/:orderNum',async function(req,res)
                 for (const courseID of coursesID)
                     {
                         console.log(`coursesID elements :${courseID}`)
-                        const createdCart = await Cart.insertOne({user_id:id,course_id:courseID,order_num:orderNum})  
+                        const createdCart = await Cart.insertOne({user_id:id,course_id:courseID})  
                         if (!createdCart)
                             {
                                 console.log(`Error creating item`)
@@ -740,8 +767,7 @@ router.post('/cart/:orderNum',async function(req,res)
                                 console.log(courseID+" Sucessfully inserted")
                                 inserted += 1;        
                             }
-                    }
-                console.log(inserted+errors.length==coursesID.length);       
+                    }     
                 if (errors.length>0)
                     {
                         console.log(errors+" was the cause for issue")
@@ -821,7 +847,7 @@ router.put('/cart/:orderNum/:courseID',async function(req,res)
         try
             {   
                 console.log("Editing cart now with changes:" + JSON.stringify(changes))
-                const updatedCart = await Cart.updateOne({order_num:orderNum,course_id:courseID},changes)
+                const updatedCart = await Cart.updateOne({_id:orderNum,course_id:courseID},changes)
                 
                 if(!updatedCart)
                     {
@@ -864,7 +890,7 @@ router.delete('/cart/:orderNum',async function(req,res)
         try
             {
                 console.log("Starting deletion of cart")
-                const deletedCart = await Cart.deleteMany({order_num:orderNum})
+                const deletedCart = await Cart.deleteMany({_id:orderNum})
                     {
                         if(!deletedCart)
                             {
